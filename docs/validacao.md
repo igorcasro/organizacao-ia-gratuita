@@ -62,7 +62,7 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | `validar-fluxo` no modo nuvem com `deepseek-v4.1-flash-free`: inicialização, leitura, explicação, alteração, teste e reversão — **6 de 6** | Testado (avaliação da pessoa) |
 | Comando `npm test` executado pelo agente **sem pedir aprovação**: está de acordo com as permissões geradas (só comandos de rede pedem). O roteiro dizia "após sua permissão"; texto corrigido | Testado |
 | Antes de reverter (ação destrutiva), o agente pediu confirmação na conversa. Não se sabe se veio de uma permissão do OpenCode ou das instruções de segurança | Observado; origem pendente |
-| Interface do OpenCode no Git Bash: a resposta rola dentro da área do OpenCode e não pôde ser lida por inteiro; o cursor de texto não aparece | Problema observado; terminal exato e comparação com o PowerShell/Windows Terminal pendentes |
+| Interface do OpenCode no Git Bash: a resposta rola dentro da área do OpenCode e não pôde ser lida por inteiro; o cursor de texto não aparece | Problema observado com o Git Bash aberto a partir do PowerShell; comparação com o OpenCode aberto direto no PowerShell pendente |
 | `verificar`: pedido de teste falhou no Git Bash com *"Failed to change directory to /c/Users/..."*: o OpenCode recebia a variável `PWD` no formato MSYS. Corrigido em `util.childEnv` (o `PWD` do processo filho passa a ser a pasta real, no formato do Windows) | Corrigido; reteste pendente |
 
 ## Confirmado em documentação ou código, não executado

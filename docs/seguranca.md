@@ -46,6 +46,7 @@ Toda sessão iniciada por `node scripts/ia-local.mjs iniciar` recebe, sem altera
 | Modelos pagos do OpenCode escondidos | `OPENCODE_API_KEY` removida do ambiente (sem conta, o OpenCode habilita só os gratuitos) |
 | Buscar URLs (`webfetch` e o `fetch` do Code Mode) **pede aprovação** | `permissions`: `webfetch` → `ask` |
 | Comandos que enviam dados para fora **pedem aprovação**: `curl`, `wget`, `scp`, `ssh`, `rsync`, `nc`, `Invoke-WebRequest`, `Invoke-RestMethod`, `iwr`, `irm`, `git push`, `git remote`, `npm publish`, `gh` | `permissions`: `shell` → `ask` |
+| Os demais comandos (`npm test`, `git diff`, `ls` e também os que apagam arquivos) **rodam sem pedir aprovação**. Decisão do mantenedor em 2026-11-07, após a validação no Windows: manter o fluxo ágil e contar com o git para revisar e reverter. Por isso, trabalhe sempre com o projeto versionado e revise com `git diff` | padrão do OpenCode (sem regra própria) |
 | Acesso a pastas fora do projeto **pede aprovação** | `permissions`: `external_directory` → `ask` |
 | **Leitura e edição bloqueadas** em `.env*` (exceto `.env.example`), `*.pem`, `*.key`, `*.p12`, `*.pfx`, `*.kdbx`, `id_rsa`, `id_ed25519`, `.ssh/`, `.aws/`, `.azure/`, `.gnupg/`, `.git-credentials`, `.npmrc`, `.pypirc`, `.docker/config.json`, `.kube/config` | `permissions`: `read`/`edit` → `deny` |
 | Regras de segurança entregues ao modelo em toda sessão | `instructions`: [`configs/instrucoes-seguranca.md`](../configs/instrucoes-seguranca.md) |
