@@ -46,6 +46,25 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Recomendação com GPU integrada (usa só a RAM, explica o Vulkan) | Testado |
 | Avisos de falta de driver Vulkan e de grupos `render`/`video` | Testado (dados simulados) |
 
+### Windows 11 real — Parte A, modo nuvem (em andamento)
+
+**Ambiente:** Windows 11 Pro 64 bits, Node.js 22.15.1, Git 2.49.0, terminal **Git Bash** (o manual cobre o PowerShell; o Git Bash está sendo validado como alternativa). **Data:** 2026-11-07.
+
+| Item | Situação |
+|---|---|
+| `winget search --id OpenJS.NodeJS.LTS -e` e `--id Git.Git -e` encontram os pacotes (o LTS oferecido era o Node.js 26.13.0; o manual ainda cita o 24 como referência — revisar) | Testado |
+| Node.js 22 atende ao mínimo (≥ 20) para o OpenCode e os scripts | Testado |
+| `npm install -g @opencode/cli@2.2.6` no Git Bash, sem administrador; `opencode --version` → `2.2.6` | Testado |
+| `ajuda`, `modo` (nuvem, só `opencode`, `concordo`, modelo sugerido), `status` | Testado |
+| `verificar`: OpenCode 2, consentimento, chaves, `opencode models` com 11 modelos, só o provedor `opencode`, `deepseek-v4.1-flash-free` disponível | Testado |
+| `npm test` no Windows: 19 passaram e 2 falharam (os testes de `/sys` do Linux criam pastas com `:`, nome proibido no Windows). Esses 2 passam a ser pulados no Windows, como os 9 de CLI (executáveis falsos em `sh`). Resultado esperado no Windows: **19 passam, 11 pulados, 0 falhas**; no Linux, 30 de 30 | Corrigido; reteste pendente |
+| `verificar` após a correção do `PWD`: pedido de teste respondido `OK`; verificado tecnicamente | Testado |
+| `validar-fluxo` no modo nuvem com `deepseek-v4.1-flash-free`: inicialização, leitura, explicação, alteração, teste e reversão — **6 de 6** | Testado (avaliação da pessoa) |
+| Comando `npm test` executado pelo agente **sem pedir aprovação**: está de acordo com as permissões geradas (só comandos de rede pedem). O roteiro dizia "após sua permissão"; texto corrigido | Testado |
+| Antes de reverter (ação destrutiva), o agente pediu confirmação na conversa. Não se sabe se veio de uma permissão do OpenCode ou das instruções de segurança | Observado; origem pendente |
+| Interface do OpenCode no Git Bash: a resposta rola dentro da área do OpenCode e não pôde ser lida por inteiro; o cursor de texto não aparece | Problema observado; terminal exato e comparação com o PowerShell/Windows Terminal pendentes |
+| `verificar`: pedido de teste falhou no Git Bash com *"Failed to change directory to /c/Users/..."*: o OpenCode recebia a variável `PWD` no formato MSYS. Corrigido em `util.childEnv` (o `PWD` do processo filho passa a ser a pasta real, no formato do Windows) | Corrigido; reteste pendente |
+
 ## Confirmado em documentação ou código, não executado
 
 | Item | Fonte |
@@ -114,7 +133,6 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Download interrompido: se o `ollama pull` reaproveita as partes já baixadas | Interromper com Ctrl+C e repetir |
 | Licença e quantização de `qwen3.5:4b` e `qwen3.5:9b` | `ollama show <tag> --license` e `ollama show <tag>` |
 | Estimativas de memória do catálogo × medições reais | Comparar a saída de `verificar` com a coluna "memória estimada" de `modelos` |
-| Identificadores do winget (`OpenJS.NodeJS.LTS`, `Git.Git`) | `winget search` |
 | ARM64 (Windows ou Linux) | Fora do escopo inicial |
 
 ## Roteiro de validação num computador
@@ -141,4 +159,4 @@ Use-o em cada sistema (Windows 11 e Ubuntu 24.04) e em perfis de hardware difere
 
 | Data | Sistema | CPU / RAM / GPU (VRAM) | Ollama | OpenCode | Modelo | Contexto | Medição (memória, % GPU) | Fluxo (6 itens) | Observações |
 |---|---|---|---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — | — | — | Nenhuma validação real registrada ainda |
+| 2026-11-07 | Windows 11 Pro 64 bits, Git Bash | não se aplica (modo nuvem) | não instalado | 2.2.6 | `opencode/deepseek-v4.1-flash-free` (nuvem) | definido pelo provedor | não se aplica | 6 de 6 ok | Ver observações abaixo |

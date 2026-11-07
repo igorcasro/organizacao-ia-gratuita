@@ -2,7 +2,7 @@
   "versao_esquema": 1,
   "atualizado_em": "2026-11-07",
   "observacoes": [
-    "Opções gratuitas em nuvem, usadas SOMENTE quando o usuário escolhe o modo 'misto' ou 'nuvem'. O modo padrão continua 'local'.",
+    "Opções gratuitas em nuvem, usadas SOMENTE quando o usuário escolhe o modo 'nuvem' ou 'misto' e registra o consentimento. Nenhum modo vem ativado por padrão.",
     "Nada aqui é pago: provedores que exigem cartão, créditos ou assinatura não entram neste arquivo.",
     "Modelos gratuitos em nuvem mudam com frequência ('por tempo limitado'). Confira a fonte e atualize 'consultado_em'.",
     "No modo nuvem, o código do projeto e os pedidos são enviados ao provedor. Veja 'privacidade' de cada modelo."

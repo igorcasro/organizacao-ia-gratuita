@@ -75,6 +75,6 @@ Se preferir chamar o OpenCode diretamente, o caminho oficial do Ollama é:
 ollama launch opencode --model ia-local-<id>:64k
 ```
 
-Nesse caso as políticas "somente local" do script **não** são aplicadas. Para tê-las sempre, copie [`configs/opencode.somente-local.jsonc`](../configs/opencode.somente-local.jsonc) para a pasta de configuração do OpenCode (mostrada por `opencode debug paths config`). Antes, faça uma cópia de qualquer `opencode.json`/`opencode.jsonc` que já exista lá.
+Nesse caso as políticas e permissões do script **não** são aplicadas. Para ter ao menos as políticas de provedor e de busca na web, copie o exemplo do seu modo — [`configs/opencode.somente-local.jsonc`](../configs/opencode.somente-local.jsonc) (local) ou [`configs/opencode.nuvem-gratuita.jsonc`](../configs/opencode.nuvem-gratuita.jsonc) (nuvem; para o misto, descomente a linha do `ollama`) — para a pasta de configuração do OpenCode (mostrada por `opencode debug paths config`). Antes, faça uma cópia de qualquer `opencode.json`/`opencode.jsonc` que já exista lá.
 
 **Não** rode `ollama launch opencode` sem o OpenCode 2 instalado: nesse caso o Ollama instala o OpenCode 1.

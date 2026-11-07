@@ -302,8 +302,8 @@ const ROTEIRO = [
   ["inicializacao", "O OpenCode abriu e mostra o modelo escolhido (comando /models ou rodapé); em /models só aparecem provedores liberados pelo modo."],
   ["leitura", "Pedido: \"Leia o arquivo src/calculadora.mjs e liste as funções.\" O modelo usou a ferramenta de leitura e respondeu corretamente."],
   ["explicacao", "Pedido: \"Explique o que a função media faz e qual problema ela tem com lista vazia.\" A explicação faz sentido."],
-  ["alteracao", "Pedido: \"Corrija media para retornar 0 quando a lista estiver vazia.\" O arquivo foi alterado (confira com git diff)."],
-  ["teste", "Pedido: \"Execute npm test e me diga o resultado.\" O modelo executou o comando (após sua permissão) e os testes passaram."],
+  ["alteracao", "Pedido: \"Corrija media para retornar 0 quando a lista estiver vazia.\" O arquivo da CÓPIA DESCARTÁVEL (pasta mostrada acima, não o seu repositório) foi alterado; confira com git diff nessa pasta."],
+  ["teste", "Pedido: \"Remova o .skip do teste 'media de lista vazia' e execute npm test.\" O modelo executou o comando e os 4 testes passaram. (Comandos comuns como npm test rodam sem pedir aprovação; só comandos de rede pedem.)"],
   ["reversao", "Você revisou a alteração com git diff e conseguiu revertê-la (git checkout -- . ou /undo no OpenCode)."],
 ];
 
@@ -335,7 +335,9 @@ export async function cmdValidarFluxo() {
   }
   console.log("\nEm OUTRO terminal, execute:");
   console.log(`  node "${path.join(REPO_DIR, "scripts", "ia-local.mjs")}" iniciar "${dest ?? "<pasta do projeto descartável>"}"`);
-  console.log("Siga os itens abaixo dentro do OpenCode e responda aqui ao final de cada um.\n");
+  console.log("Siga os itens abaixo dentro do OpenCode e responda aqui ao final de cada um.");
+  if (dest) console.log(`As alterações do modelo acontecem SÓ na cópia (${dest}); o repositório não muda.`);
+  console.log("");
   const itens = {};
   for (const [id, texto] of ROTEIRO) {
     console.log(`- ${texto}`);

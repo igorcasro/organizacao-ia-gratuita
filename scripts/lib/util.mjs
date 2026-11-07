@@ -74,7 +74,7 @@ export function runCapture(cmd, args = [], { timeoutMs = 8000, shell, env, cwd }
     timeout: timeoutMs,
     shell: useShell,
     windowsHide: true,
-    env,
+    env: childEnv(env, cwd),
     cwd,
   });
   return {
@@ -97,7 +97,7 @@ export function runInteractive(cmd, args = [], { cwd, env } = {}) {
     const useShell = IS_WINDOWS && !/\.exe$/i.test(cmd) && cmd !== "ollama";
     const child = spawn(useShell ? quoteForShell(cmd, args) : cmd, useShell ? [] : args, {
       cwd,
-      env: env ? mergeEnv(env) : process.env,
+      env: childEnv(env ? mergeEnv(env) : undefined, cwd),
       stdio: "inherit",
       shell: useShell,
     });
@@ -114,6 +114,18 @@ export function mergeEnv(extra) {
     else env[k] = v;
   }
   return env;
+}
+
+// Ambiente para processos filhos. No Windows, terminais como o Git Bash (MSYS) guardam a pasta atual
+// em PWD no formato "/c/Users/...". Programas nativos que confiam em PWD (como o OpenCode 2) não
+// conseguem entrar nessa pasta ("Failed to change directory"). Aqui PWD passa a ser a pasta real do
+// processo filho, no formato do sistema. Em outros sistemas o ambiente não muda.
+export function childEnv(env, cwd, { windows = IS_WINDOWS } = {}) {
+  if (!windows) return env;
+  const base = { ...(env ?? process.env) };
+  for (const k of Object.keys(base)) if (k.toUpperCase() === "PWD") delete base[k];
+  base.PWD = path.win32.resolve(cwd ?? process.cwd());
+  return base;
 }
 
 export function commandExists(cmd) {

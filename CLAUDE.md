@@ -4,7 +4,7 @@ Este arquivo orienta quem (pessoa ou assistente de IA) for manter o repositório
 
 ## Objetivo
 
-Permitir que pessoas diferentes, em computadores diferentes (Windows 11 ou Ubuntu 24.04), usem **OpenCode + Ollama + modelos locais** sem assinatura nem API paga. O repositório **não** recria o OpenCode nem o Ollama: só diagnostica, orienta a escolha do modelo, prepara a configuração e inicia.
+Permitir que pessoas diferentes, em computadores diferentes (Windows 11 ou Ubuntu 24.04), usem o **OpenCode 2** com **modelos gratuitos** — em nuvem (prioridade) ou locais pelo **Ollama** (último recurso) — sem assinatura, cartão nem API paga. O repositório **não** recria o OpenCode nem o Ollama: só diagnostica, orienta a escolha do modelo, prepara a configuração e inicia.
 
 ## Regras que não podem ser quebradas
 

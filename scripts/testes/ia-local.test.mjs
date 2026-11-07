@@ -13,6 +13,9 @@ import { startOllamaMock, fakeBinaries } from "./simulador.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const CLI = path.join(ROOT, "scripts", "ia-local.mjs");
 const isWindows = process.platform === "win32";
+// Motivos para pular no Windows (aparecem na saída do npm test).
+const SKIP_CLI = isWindows && "usa executáveis falsos em shell (sh); roda no Linux";
+const SKIP_SYSFS = isWindows && "simula o /sys do Linux, com ':' nos nomes de pasta (proibido no Windows); roda no Linux";
 
 const catalogo = await import("../lib/catalogo.mjs");
 const ollama = await import("../lib/ollama.mjs");
@@ -161,7 +164,7 @@ before(async () => {
 });
 after(async () => mock?.close());
 
-test("CLI: seleção, verificação e início com simuladores", { skip: isWindows }, async () => {
+test("CLI: seleção, verificação e início com simuladores", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   const env = { IA_LOCAL_HOME: home, OLLAMA_HOST: `127.0.0.1:${mock.port}`, PATH: `${bins.dir}${path.delimiter}${process.env.PATH}` };
@@ -200,7 +203,7 @@ test("CLI: seleção, verificação e início com simuladores", { skip: isWindow
   assert.deepEqual(policy.policies.map((p) => `${p.action}:${p.resource}:${p.effect}`), ["provider.use:*:deny", "provider.use:ollama:allow", "websearch.use:*:deny"]);
 });
 
-test("CLI: recusa iniciar com OpenCode 1", { skip: isWindows }, async () => {
+test("CLI: recusa iniciar com OpenCode 1", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port, { opencodeVersion: "1.19.5" });
   await fetch(`http://127.0.0.1:${mock.port}/_mock/add`, { method: "POST", body: JSON.stringify({ name: "ia-local-x:64k" }) });
@@ -212,7 +215,7 @@ test("CLI: recusa iniciar com OpenCode 1", { skip: isWindows }, async () => {
   assert.ok(!bins.calls().some((c) => c.args[0] === "launch"));
 });
 
-test("CLI: download recusado não altera preferências", { skip: isWindows }, async () => {
+test("CLI: download recusado não altera preferências", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   const env = { IA_LOCAL_HOME: home, OLLAMA_HOST: `127.0.0.1:${mock.port}`, PATH: `${bins.dir}${path.delimiter}${process.env.PATH}` };
@@ -259,7 +262,7 @@ function fakeDevice(root, slot, files) {
   return dir;
 }
 
-test("AMD no Linux: regra do Ollama para integrada x dedicada", () => {
+test("AMD no Linux: regra do Ollama para integrada x dedicada", { skip: SKIP_SYSFS }, () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-sys-"));
   const GB = 1024 ** 3;
   const dGpu = fakeDevice(root, "0000:03:00.0", { vendor: "0x1002", mem_info_vram_total: 8 * GB, mem_info_gtt_total: 16 * GB, mem_info_vram_vendor: "samsung" });
@@ -269,7 +272,7 @@ test("AMD no Linux: regra do Ollama para integrada x dedicada", () => {
   assert.equal(gpu.amdSysfsType(apu).tipo, "integrada");
 });
 
-test("Linux: lista AMD dedicada, APU AMD e Intel integrada a partir de /sys", () => {
+test("Linux: lista AMD dedicada, APU AMD e Intel integrada a partir de /sys", { skip: SKIP_SYSFS }, () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-sys-"));
   const GB = 1024 ** 3;
   const devs = {
@@ -364,7 +367,7 @@ function cloudEnv(home, bins, extra = {}) {
   return { IA_LOCAL_HOME: home, OLLAMA_HOST: "127.0.0.1:9", PATH: `${bins.dir}${path.delimiter}${process.env.PATH}`, OPENCODE_API_KEY: "chave-paga-que-nao-deve-passar", OPENROUTER_API_KEY: "", ...extra };
 }
 
-test("CLI: modo nuvem exige 'concordo' e não altera nada sem ele", { skip: isWindows }, async () => {
+test("CLI: modo nuvem exige 'concordo' e não altera nada sem ele", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   const r = await runCli(["modo"], { env: cloudEnv(home, bins), input: "\n\nn\nsim\n" });
@@ -373,7 +376,7 @@ test("CLI: modo nuvem exige 'concordo' e não altera nada sem ele", { skip: isWi
   assert.ok(!fs.existsSync(path.join(home, "preferencias.json")));
 });
 
-test("CLI: modo nuvem sem Ollama — seleção, verificação e início", { skip: isWindows }, async () => {
+test("CLI: modo nuvem sem Ollama — seleção, verificação e início", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   const env = cloudEnv(home, bins);
@@ -405,7 +408,7 @@ test("CLI: modo nuvem sem Ollama — seleção, verificação e início", { skip
   assert.ok(!bins.calls().some((c) => c.bin === "ollama" && c.args[0] !== "--version"), "não chama o Ollama no modo nuvem");
 });
 
-test("CLI: modo misto inicia na nuvem com o modelo local como reserva manual", { skip: isWindows }, async () => {
+test("CLI: modo misto inicia na nuvem com o modelo local como reserva manual", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   await fetch(`http://127.0.0.1:${mock.port}/_mock/add`, { method: "POST", body: JSON.stringify({ name: "ia-local-m:64k" }) });
@@ -436,7 +439,7 @@ test("CLI: modo misto inicia na nuvem com o modelo local como reserva manual", {
   assert.equal(JSON.parse(fs.readFileSync(launch2.OPENCODE_CONFIG, "utf8")).providers, undefined);
 });
 
-test("CLI: sem modo escolhido, iniciar orienta a escolher (recomendado: nuvem)", { skip: isWindows }, async () => {
+test("CLI: sem modo escolhido, iniciar orienta a escolher (recomendado: nuvem)", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   const r = await runCli(["iniciar", os.tmpdir()], { env: cloudEnv(home, bins) });
@@ -445,7 +448,7 @@ test("CLI: sem modo escolhido, iniciar orienta a escolher (recomendado: nuvem)",
   assert.match(r.out, /Recomendado: nuvem/);
 });
 
-test("CLI: modo misto/nuvem sem consentimento não inicia", { skip: isWindows }, async () => {
+test("CLI: modo misto/nuvem sem consentimento não inicia", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   fs.writeFileSync(path.join(home, "preferencias.json"), JSON.stringify({ ...prefs.empty(), modo: "nuvem", nuvem: { provedores: ["opencode"], modelo: null, consentimento: null } }));
@@ -489,7 +492,7 @@ test("variáveis que reduzem tráfego externo, por modo", () => {
   assert.equal(ocMod.launchEnv(["opencode"], "f", { naoConfiavel: true }).OPENCODE_DISABLE_PROJECT_CONFIG, "1");
 });
 
-test("CLI: iniciar --nao-confiavel ignora a configuração do projeto", { skip: isWindows }, async () => {
+test("CLI: iniciar --nao-confiavel ignora a configuração do projeto", { skip: SKIP_CLI }, async () => {
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   fs.writeFileSync(path.join(home, "preferencias.json"), JSON.stringify({ ...prefs.empty(), modo: "nuvem", nuvem: { provedores: ["opencode"], modelo: null, consentimento: { versao: 1, data: "x" } } }));
@@ -500,4 +503,17 @@ test("CLI: iniciar --nao-confiavel ignora a configuração do projeto", { skip: 
   assert.equal(launch.OPENCODE_DISABLE_PROJECT_CONFIG, "1");
   assert.equal(launch.OPENCODE_DISABLE_AUTOUPDATE, "1");
   assert.equal(launch.OPENCODE_DISABLE_CLAUDE_CODE, "1");
+});
+
+test("Windows: PWD do Git Bash é trocado pela pasta real do processo filho", async () => {
+  const { childEnv } = await import("../lib/util.mjs");
+  const base = { PWD: "/c/Users/fulano/projeto", PATH: "x", OPENCODE_CONFIG: "y" };
+  const env = childEnv(base, "C:\\Users\\fulano\\AppData\\Local\\Temp", { windows: true });
+  assert.equal(env.PWD, "C:\\Users\\fulano\\AppData\\Local\\Temp");
+  assert.equal(env.PATH, "x");
+  assert.equal(env.OPENCODE_CONFIG, "y");
+  assert.equal(base.PWD, "/c/Users/fulano/projeto", "não altera o objeto original");
+  // Fora do Windows, nada muda.
+  assert.equal(childEnv(base, "/tmp", { windows: false }), base);
+  assert.equal(childEnv(undefined, "/tmp", { windows: false }), undefined);
 });
