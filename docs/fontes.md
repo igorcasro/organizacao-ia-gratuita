@@ -20,6 +20,11 @@ Todas consultadas em **2026-11-07**. Quando a fonte foi o repositório oficial, 
 | Variáveis `OPENCODE_CONFIG`, `OPENCODE_CONFIG_CONTENT`, `OPENCODE_DISABLE_FREE_MODELS` | `packages/cli/src/server-process.ts`, `packages/core/src/config.ts`, `packages/core/src/model.ts` |
 | Opções da linha de comando (a interface principal não tem `--model`) | `packages/cli/src/commands/commands.ts` |
 | Shell usado no Windows | `packages/core/src/shell/select.ts` |
+| Desktop, web (`opencode pair`) e ACP | `index.mdx` (seções *Desktop* e *Web*), `cli/web.mdx`, `cli/acp.mdx` |
+| Serviço compartilhado em segundo plano | `cli/index.mdx` (*Background service*), `cli/commands.mdx` (`service`, `reload`); `packages/desktop/src/main/service/background-service.ts` e `desktop-cli.ts` |
+| Pasta global de configuração (inclusive no Windows) | `packages/util/src/global-roots.ts`, `packages/util/src/global.ts` |
+| Ordem de carga das configurações e precedência das políticas | `packages/core/src/config.ts`, `packages/core/src/config/plugin/policy.ts`; `policies.mdx` (*Precedence*) |
+| Desktop lê só `opencode.json(c)` | `build/plugins/gui/index.mdx` |
 | Documentação do V1 (para comparação; não usar nos manuais) | `packages/web/src/content/docs/index.mdx` |
 
 ## Ollama (versão 0.40.15)

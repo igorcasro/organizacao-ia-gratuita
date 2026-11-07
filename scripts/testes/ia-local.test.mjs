@@ -517,3 +517,13 @@ test("Windows: PWD do Git Bash é trocado pela pasta real do processo filho", as
   assert.equal(childEnv(base, "/tmp", { windows: false }), base);
   assert.equal(childEnv(undefined, "/tmp", { windows: false }), undefined);
 });
+
+test("exemplo de configuração global: mesmas permissões do script e nenhuma regra de provedor", async () => {
+  const opencodeMod = await import("../lib/opencode.mjs");
+  const texto = fs.readFileSync(path.join(ROOT, "configs", "opencode.global.jsonc"), "utf8");
+  const json = JSON.parse(texto.split(/\r?\n/).filter((l) => !/^\s*\/\//.test(l)).join("\n"));
+  assert.deepEqual(json.permissions, opencodeMod.securityPermissions(), "atualize configs/opencode.global.jsonc");
+  assert.ok(!json.policies.some((p) => p.action === "provider.use"), "política global de provedor quebraria os modos local e misto");
+  assert.ok(json.policies.some((p) => p.action === "websearch.use" && p.effect === "deny"));
+  assert.match(json.instructions[0], /configs\/instrucoes-seguranca\.md$/);
+});

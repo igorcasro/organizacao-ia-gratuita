@@ -9,6 +9,9 @@
 //   Global (todos os projetos):  opencode.jsonc dentro da pasta mostrada por  opencode debug paths config
 //                                (no Linux, normalmente ~/.config/opencode)
 //   Projeto (só um projeto):     <pasta do projeto>/opencode.jsonc
+// ATENÇÃO: na pasta GLOBAL, as regras de provedor deste arquivo passam a valer também para o script e
+// bloqueiam os outros modos (políticas globais vencem; ver docs/interface-grafica.md). Para o Desktop e
+// para vários modos, use configs/opencode.global.jsonc.
 //
 // Substitua <MODELO> pelo nome efetivo mostrado em "node scripts/ia-local.mjs status",
 // por exemplo: ia-local-qwen3.5-9b:64k

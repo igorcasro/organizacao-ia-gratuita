@@ -59,8 +59,9 @@ Menu completo: `node scripts/ia-local.mjs`. Ajuda: `node scripts/ia-local.mjs aj
 5. [docs/uso-diario.md](docs/uso-diario.md) — como trabalhar em projetos existentes
 6. [docs/problemas.md](docs/problemas.md) — diagnóstico de falhas, atualização, recuperação e desinstalação
 7. [docs/validacao.md](docs/validacao.md) — o que foi testado, o que só foi confirmado em documentação e o que está pendente
-8. [docs/arquitetura.md](docs/arquitetura.md) — como as peças se encaixam (para quem vai manter o repositório)
-9. [docs/fontes.md](docs/fontes.md) — referências oficiais e datas de consulta
+8. [docs/interface-grafica.md](docs/interface-grafica.md) — OpenCode Desktop e interface web: o que funciona, o que não, e como aplicar as proteções
+9. [docs/arquitetura.md](docs/arquitetura.md) — como as peças se encaixam (para quem vai manter o repositório)
+10. [docs/fontes.md](docs/fontes.md) — referências oficiais e datas de consulta
 
 ## O que fica no repositório e o que fica no seu computador
 

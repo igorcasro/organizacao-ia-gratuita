@@ -23,7 +23,7 @@ Permitir que pessoas diferentes, em computadores diferentes (Windows 11 ou Ubunt
 - `scripts/testes/` — testes com Ollama e OpenCode simulados. Executar: `node --test scripts/testes/ia-local.test.mjs` (ou `npm test`).
 - `catalogo/modelos.json` — modelos locais (validado por `catalogo.validate`); `catalogo/nuvem-gratuita.json` — provedores e modelos gratuitos em nuvem (validado por `nuvem.validate`).
 - `configs/instrucoes-seguranca.md` — regras de segurança entregues ao modelo em toda sessão; mudanças nele afetam todos os usuários.
-- `configs/` — exemplos; nunca são aplicados automaticamente.
+- `configs/` — exemplos; nunca são aplicados automaticamente. `configs/opencode.global.jsonc` leva as proteções independentes de modo ao Desktop e à interface web e **não pode ter regra de provedor** (políticas globais vencem as do script; ver docs/interface-grafica.md). Se mudar `securityPermissions()`, atualize-o (o teste avisa).
 - `exemplos/projeto-validacao/` — projeto descartável do roteiro de validação.
 - `docs/` — manuais e referências.
 

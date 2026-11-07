@@ -112,6 +112,25 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Telemetria só com `OTEL_EXPORTER_OTLP_ENDPOINT`; compartilhamento de sessões removido; Console só com conta conectada; catálogo em `models.opencode.ai`; consulta de atualização e variável para desligá-la | Confirmado (código, v2.2.6) |
 | Efeito real das permissões e do tráfego de rede nos três modos | Pendente (roteiro em [seguranca.md](seguranca.md#como-conferir-você-mesmo)) |
 
+### Interface gráfica: Desktop e web (análise em 2026-11-07)
+
+| Item | Situação |
+|---|---|
+| Desktop e interface web usam o serviço compartilhado em segundo plano, que não recebe as variáveis do `iniciar` | Confirmado (doc `cli/index.mdx`; código `packages/desktop/src/main/service/background-service.ts`, v2.2.6) |
+| A configuração global `~/.config/opencode/opencode.json(c)` vale para todos os clientes; no Windows, `C:\Users\<usuário>\.config\opencode` | Confirmado (doc `config.mdx`; código `packages/util/src/global-roots.ts`) |
+| Políticas globais prevalecem sobre as de projeto e sobre as de `OPENCODE_CONFIG`; por isso `configs/opencode.global.jsonc` não tem regra de provedor | Confirmado (código `packages/core/src/config.ts`, `config/plugin/policy.ts`) |
+| `configs/opencode.global.jsonc` tem as mesmas permissões do script e nenhuma regra de provedor | Testado (teste automatizado) |
+| Desktop traz o próprio OpenCode embutido e se atualiza: a versão não fica fixa em 2.2.6 | Confirmado (código `packages/desktop/src/main/service/desktop-cli.ts`); versão real pendente |
+| Efeito real no Desktop e na web: permissões pedidas, segredos bloqueados, busca na web bloqueada, instruções carregadas, só modelos gratuitos sem conta | **Pendente** (roteiro abaixo) |
+| `instructions` com caminho absoluto do Windows em barras normais (`C:/...`) | **Pendente** |
+
+**Roteiro (num computador sem dados importantes no OpenCode):**
+1. Aplique a configuração global como em [interface-grafica.md](interface-grafica.md#como-aplicar-opcional-manual).
+2. No terminal, sem o script: `opencode` dentro de uma cópia de `exemplos/projeto-validacao`. Peça "busque na web a versão do Node.js" (deve recusar), "leia o arquivo .env" (crie um `.env` falso antes; deve ser negado) e "rode curl https://example.com" (deve pedir aprovação; recuse).
+3. Repita os mesmos pedidos no Desktop e em `opencode pair` (link local).
+4. Em `/models` (ou no seletor do Desktop), anote se aparecem só modelos gratuitos e os do Ollama.
+5. Anote a versão do OpenCode embutida no Desktop (tela *Sobre* ou *Settings*).
+
 ## Pendente de validação
 
 | Item | Como validar |

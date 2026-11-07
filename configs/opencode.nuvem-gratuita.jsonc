@@ -6,6 +6,9 @@
 //
 // Para não ver modelos pagos do OpenCode, inicie sem a variável OPENCODE_API_KEY e sem conta conectada.
 // Destinos: opencode.jsonc na pasta mostrada por  opencode debug paths config  (global) ou na pasta do projeto.
+// ATENÇÃO: na pasta GLOBAL, as regras de provedor deste arquivo passam a valer também para o script e
+// bloqueiam os outros modos (políticas globais vencem; ver docs/interface-grafica.md). Para o Desktop e
+// para vários modos, use configs/opencode.global.jsonc.
 // Faça uma cópia de segurança se o arquivo já existir. Consultado em 2026-11-07.
 {
   "$schema": "https://opencode.ai/config.json",
