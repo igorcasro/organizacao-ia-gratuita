@@ -1,0 +1,26 @@
+// Exemplo de configuração do OpenCode 2 (formato nativo V2) para uso somente local com o Ollama.
+//
+// Você NÃO precisa copiar este arquivo para usar o repositório: o comando
+//   node scripts/ia-local.mjs iniciar
+// já aplica estas políticas por meio da variável OPENCODE_CONFIG, sem alterar seus arquivos.
+//
+// Use-o apenas se quiser iniciar o OpenCode diretamente (comando "opencode") com as mesmas regras.
+// Destinos possíveis (faça uma cópia de segurança se o arquivo já existir):
+//   Global (todos os projetos):  opencode.jsonc dentro da pasta mostrada por  opencode debug paths config
+//                                (no Linux, normalmente ~/.config/opencode)
+//   Projeto (só um projeto):     <pasta do projeto>/opencode.jsonc
+//
+// Substitua <MODELO> pelo nome efetivo mostrado em "node scripts/ia-local.mjs status",
+// por exemplo: ia-local-qwen3.5-9b:64k
+// Referências: https://opencode.ai/docs/config  e  https://opencode.ai/docs/policies (consultadas em 2026-11-07)
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ollama/<MODELO>",
+  "policies": [
+    // A última regra que corresponder vence: nega todos os provedores e libera só o Ollama.
+    { "action": "provider.use", "resource": "*", "effect": "deny" },
+    { "action": "provider.use", "resource": "ollama", "effect": "allow" },
+    // Busca na web passa por serviços externos; desativada por padrão.
+    { "action": "websearch.use", "resource": "*", "effect": "deny" }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "projeto-validacao",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Projeto mínimo e descartável para validar o fluxo OpenCode + Ollama.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

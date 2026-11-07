@@ -1,0 +1,21 @@
+// Exemplo do OpenCode 2 para usar SÓ modelos gratuitos em nuvem, sem o script.
+// O comando  node scripts/ia-local.mjs iniciar  (modo "nuvem") já aplica isto sem alterar seus arquivos.
+//
+// Atenção: com estes provedores liberados, o código do projeto é enviado ao provedor do modelo.
+// Leia docs/nuvem-gratuita.md (privacidade e limites) antes de usar.
+//
+// Para não ver modelos pagos do OpenCode, inicie sem a variável OPENCODE_API_KEY e sem conta conectada.
+// Destinos: opencode.jsonc na pasta mostrada por  opencode debug paths config  (global) ou na pasta do projeto.
+// Faça uma cópia de segurança se o arquivo já existir. Consultado em 2026-11-07.
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Modelo padrão. Escolha outro em /models; a lista de gratuitos muda com frequência.
+  "model": "opencode/deepseek-v4.1-flash-free",
+  "policies": [
+    { "action": "provider.use", "resource": "*", "effect": "deny" },
+    { "action": "provider.use", "resource": "opencode", "effect": "allow" },
+    // Para o modo misto (Ollama + nuvem gratuita), acrescente:
+    // { "action": "provider.use", "resource": "ollama", "effect": "allow" },
+    { "action": "websearch.use", "resource": "*", "effect": "deny" }
+  ]
+}

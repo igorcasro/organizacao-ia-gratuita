@@ -1,0 +1,130 @@
+{
+  "versao_esquema": 1,
+  "atualizado_em": "2026-11-07",
+  "observacoes": [
+    "Catálogo compartilhado. Não contém preferências pessoais nem dados de hardware de ninguém.",
+    "Campos dentro de 'estimativa' são aproximações para orientar a escolha; não são medições.",
+    "Campos com valor null ou listados em 'pendencias' ainda não foram confirmados em fonte oficial.",
+    "Depois de baixar um modelo, confirme licença e quantização com: ollama show <tag> e ollama show <tag> --license.",
+    "Como editar: veja docs/modelos.md, seção 'Manutenção do catálogo'."
+  ],
+  "contexto": {
+    "padrao_tokens": 65536,
+    "reduzido_tokens": 32768,
+    "justificativa": "A documentação do Ollama indica pelo menos 64000 tokens para ferramentas de programação como o OpenCode. O valor reduzido só é oferecido quando nenhum modelo cabe com o padrão, com aviso de que fica abaixo do recomendado."
+  },
+  "modelos": [
+    {
+      "id": "qwen3.5-4b",
+      "ollama_tag": "qwen3.5:4b",
+      "nome": "Qwen3.5 4B",
+      "perfil": "entrada",
+      "parametros_b": 4,
+      "ativos_por_token_b": null,
+      "quantizacao": null,
+      "download_gb": { "min": 3.3, "max": 4.0 },
+      "janela_contexto_max_tokens": 262144,
+      "capacidades_declaradas": ["tools", "thinking", "vision"],
+      "licenca": null,
+      "pontos_fortes": [
+        "Menor download do catálogo",
+        "Viável em computadores sem GPU dedicada, com lentidão"
+      ],
+      "limitacoes": [
+        "Modelo pequeno: tende a errar mais em chamadas de ferramentas e em mudanças com vários arquivos",
+        "Indicado para explicar código e tarefas pequenas, não para refatorações amplas"
+      ],
+      "estimativa": {
+        "contexto_gb_por_64k": 1.5,
+        "nota": "Arquitetura híbrida: o custo real do contexto pode ser menor. Meça com ollama ps após carregar."
+      },
+      "pendencias": ["licenca", "quantizacao", "uso de ferramentas no OpenCode não validado"],
+      "fontes": ["https://registry.ollama.ai/library/qwen3.5"],
+      "consultado_em": "2026-11-07"
+    },
+    {
+      "id": "qwen3.5-9b",
+      "ollama_tag": "qwen3.5:9b",
+      "nome": "Qwen3.5 9B",
+      "perfil": "equilibrado",
+      "parametros_b": 9,
+      "ativos_por_token_b": null,
+      "quantizacao": null,
+      "download_gb": { "min": 6.6, "max": 7.6 },
+      "janela_contexto_max_tokens": 262144,
+      "capacidades_declaradas": ["tools", "thinking", "vision"],
+      "licenca": null,
+      "pontos_fortes": [
+        "Bom ponto de partida para GPUs com 8 a 12 GB ou computadores com 16 GB de RAM",
+        "Suporte declarado a ferramentas e raciocínio"
+      ],
+      "limitacoes": [
+        "Em CPU, respostas longas podem demorar vários minutos",
+        "Qualidade inferior a modelos maiores em tarefas com muitos arquivos"
+      ],
+      "estimativa": {
+        "contexto_gb_por_64k": 2.5,
+        "nota": "Arquitetura híbrida: o custo real do contexto pode ser menor. Meça com ollama ps após carregar."
+      },
+      "pendencias": ["licenca", "quantizacao", "uso de ferramentas no OpenCode não validado"],
+      "fontes": ["https://registry.ollama.ai/library/qwen3.5"],
+      "consultado_em": "2026-11-07"
+    },
+    {
+      "id": "gpt-oss-20b",
+      "ollama_tag": "gpt-oss:20b",
+      "nome": "gpt-oss 20B",
+      "perfil": "intermediario",
+      "parametros_b": 20,
+      "ativos_por_token_b": null,
+      "quantizacao": null,
+      "download_gb": { "min": 14, "max": 14 },
+      "janela_contexto_max_tokens": 131072,
+      "capacidades_declaradas": ["tools", "thinking"],
+      "licenca": "Apache-2.0",
+      "pontos_fortes": [
+        "Chamada de funções e esforço de raciocínio configurável, segundo o Readme do modelo",
+        "Licença permissiva"
+      ],
+      "limitacoes": [
+        "Só texto (sem imagens)",
+        "Precisa de GPU com cerca de 16 GB ou bastante RAM para rodar com conforto"
+      ],
+      "estimativa": {
+        "contexto_gb_por_64k": 1.6,
+        "nota": "Estimativa com base na arquitetura publicada (metade das camadas com janela deslizante). Meça com ollama ps."
+      },
+      "pendencias": ["quantizacao", "ativos_por_token_b", "uso de ferramentas no OpenCode não validado"],
+      "fontes": ["https://registry.ollama.ai/library/gpt-oss", "https://huggingface.co/openai/gpt-oss-20b"],
+      "consultado_em": "2026-11-07"
+    },
+    {
+      "id": "qwen3-coder-30b",
+      "ollama_tag": "qwen3-coder:30b",
+      "nome": "Qwen3-Coder 30B (MoE, 3.3B ativos)",
+      "perfil": "programacao",
+      "parametros_b": 30.5,
+      "ativos_por_token_b": 3.3,
+      "quantizacao": "Q4_K_M",
+      "download_gb": { "min": 19, "max": 19 },
+      "janela_contexto_max_tokens": 262144,
+      "capacidades_declaradas": ["tools"],
+      "licenca": "Apache-2.0",
+      "pontos_fortes": [
+        "Especializado em programação agêntica e repositórios grandes",
+        "Mixture-of-Experts: só 3.3B parâmetros ativos por token, o que ajuda a velocidade em CPU"
+      ],
+      "limitacoes": [
+        "Download grande (19 GB)",
+        "Precisa de cerca de 32 GB de RAM, ou GPU de 24 GB para rodar inteiro na GPU"
+      ],
+      "estimativa": {
+        "contexto_gb_por_64k": 6.4,
+        "nota": "Cálculo do cache K/V em f16 para 48 camadas e 4 cabeças K/V de 128 dimensões. Meça com ollama ps."
+      },
+      "pendencias": ["uso de ferramentas no OpenCode não validado"],
+      "fontes": ["https://registry.ollama.ai/library/qwen3-coder:30b"],
+      "consultado_em": "2026-11-07"
+    }
+  ]
+}

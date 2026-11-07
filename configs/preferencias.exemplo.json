@@ -1,0 +1,24 @@
+{
+  "versao_esquema": 1,
+  "atualizado_em": "2026-11-07T18:00:00.000Z",
+  "perfil_uso": {
+    "tarefas": "Pequenas alterações e testes",
+    "tamanho_projetos": "Pequenos (até ~50 arquivos)",
+    "prioridade": "equilibrio"
+  },
+  "modelo": {
+    "catalogo_id": "qwen3.5-9b",
+    "base": "qwen3.5:9b",
+    "efetivo": "ia-local-qwen3.5-9b:64k",
+    "contexto_tokens": 65536,
+    "escolhido_em": "2026-11-07T18:00:00.000Z"
+  },
+  "modo_inicio": "ollama-launch",
+  "validacoes": {
+    "ia-local-qwen3.5-9b:64k": {
+      "tecnica": { "data": "2026-11-07T18:05:00.000Z", "ok": true, "medida": { "memoria_gb": 0, "gpu_percentual": 0, "contexto_carregado": 65536 } },
+      "fluxo": { "data": "2026-11-07T18:30:00.000Z", "ok": true }
+    }
+  },
+  "_observacao": "Arquivo ilustrativo com valores fictícios. O arquivo real fica fora do repositório (veja docs/arquitetura.md)."
+}

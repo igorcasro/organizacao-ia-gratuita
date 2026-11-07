@@ -1,0 +1,10 @@
+# Mantém finais de linha previsíveis entre Windows e Ubuntu.
+* text=auto
+*.mjs text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf
+Modelfile* text eol=lf

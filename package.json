@@ -1,0 +1,11 @@
+{
+  "name": "organizacao-ia-gratuita",
+  "private": true,
+  "description": "Instalação, seleção de modelo e uso do OpenCode com Ollama e modelos locais (Windows 11 e Ubuntu 24.04).",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "ia-local": "node scripts/ia-local.mjs",
+    "test": "node --test scripts/testes/ia-local.test.mjs"
+  }
+}

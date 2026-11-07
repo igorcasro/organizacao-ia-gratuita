@@ -1,0 +1,10 @@
+# Exemplo do arquivo que o script gera em <pasta local>/modelfiles/ ao escolher um modelo.
+# Cria um modelo derivado com a janela de contexto fixada, sem baixar os pesos de novo.
+# Documentação: https://docs.ollama.com/modelfile  (seção "Setting the local context size"
+# na página de compatibilidade OpenAI: https://docs.ollama.com/api/openai-compatibility)
+#
+# Uso manual (substitua os valores):
+#   ollama create ia-local-qwen3.5-9b:64k -f Modelfile
+#   ollama rm ia-local-qwen3.5-9b:64k        # desfaz; o modelo base continua instalado
+FROM qwen3.5:9b
+PARAMETER num_ctx 65536

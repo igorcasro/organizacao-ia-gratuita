@@ -1,0 +1,46 @@
+# Dados locais do ia-local (caso alguém aponte IA_LOCAL_HOME para dentro do repositório)
+/local/
+/.ia-local/
+diagnostico.json
+preferencias.json
+preferencias.json.bak
+opencode-somente-local.json
+opencode-politicas.json
+*.Modelfile
+!configs/Modelfile.exemplo
+
+# Configurações pessoais do OpenCode em projetos de teste
+opencode.json
+opencode.jsonc
+.opencode/
+!configs/*.jsonc
+
+# Arquivos de modelos (nunca versionar)
+*.gguf
+*.safetensors
+*.bin
+models/
+blobs/
+manifests/
+
+# Logs, temporários e credenciais
+*.log
+*.tmp
+*.tmp-*
+*.bak
+.env
+.env.*
+*.key
+*.pem
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Sistemas operacionais e editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
