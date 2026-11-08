@@ -148,6 +148,22 @@ Sem Ollama, sem download de modelos e sem exigência de hardware. Exige internet
 - **Teclas:** trocar entre `plan` e `build` com **Shift+Tab**. Nova linha sem enviar: **Ctrl+J** (no Windows Terminal, Shift+Enter não funcionou).
 - Mais exemplos e boas práticas: [uso-diario.md](uso-diario.md).
 
+## Passo A7 — Usar pelo OpenCode Desktop (opcional, recomendado para o modo nuvem)
+
+Janela própria em vez do terminal, com as proteções principais. Antes, leia o que ele **não** garante em [interface-grafica.md](interface-grafica.md) (não limita provedores por modo; se atualiza sozinho).
+
+1. **Onde:** PowerShell, na pasta do repositório. **Administrador:** não.
+
+   ```powershell
+   node scripts/ia-local.mjs config-global aplicar
+   opencode service restart
+   ```
+
+   Responda `s`. **Esperado:** `Gravado: C:\Users\<você>\.config\opencode\opencode.jsonc` com o modelo padrão que não treina.
+2. **Instale o Desktop** conforme [interface-grafica.md](interface-grafica.md#instalar-o-desktop-windows-11-testado-em-2026-11-08) (sem administrador; testado em 2026-11-08).
+3. **Crie o atalho:** `node scripts/ia-local.mjs desktop atalho` e responda `s`. Abra sempre pelo atalho **OpenCode (gratuito)** da Área de Trabalho.
+4. **Verificação:** no Desktop, o modelo deve ser o padrão (ex.: DeepSeek V4.1 Flash Free) e um pedido como `Execute o comando: curl.exe -sS https://example.com` deve pedir aprovação (rejeite).
+
 
 ---
 

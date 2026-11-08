@@ -630,3 +630,39 @@ test("comandos que citam arquivos de segredos pedem aprovação", async () => {
   }
   for (const c of ["npm test", "git diff", "Get-Content src/calculadora.mjs"]) assert.equal(efeito(c), "padrão", c);
 });
+
+test("config-global atualizar: só no arquivo do repositório; modelo do dia; sem lista mantém o modelo", async () => {
+  const cg = await import("../lib/configglobal.mjs");
+  const xdg = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-xdg-"));
+  const env = { XDG_CONFIG_HOME: xdg };
+  const pasta = path.join(xdg, "opencode");
+  const alvo = path.join(pasta, "opencode.jsonc");
+
+  // Sem arquivo do repositório: nunca cria.
+  let r = cg.atualizar({ modelo: "opencode/glm-5.3-flash-free" }, env);
+  assert.equal(r.mudou, false);
+  assert.ok(!fs.existsSync(alvo));
+
+  // Arquivo do repositório com regras antigas e outro modelo: atualiza os dois sem perguntar.
+  fs.mkdirSync(pasta, { recursive: true });
+  fs.writeFileSync(alvo, cg.texto("opencode/deepseek-v4.1-flash-free").replace('"websearch.use"', '"websearch.use" ').replace("curl.exe *", "curl-antigo *"));
+  r = cg.atualizar({ modelo: "opencode/glm-5.3-flash-free" }, env);
+  assert.equal(r.mudou, true);
+  assert.equal(r.regras, true);
+  assert.equal(r.antes, "opencode/deepseek-v4.1-flash-free");
+  assert.equal(fs.readFileSync(alvo, "utf8"), cg.texto("opencode/glm-5.3-flash-free"));
+  assert.match(cg.descreverAtualizacao(r), /deepseek.*→.*glm.*regras de segurança atualizadas/);
+
+  // Sem a lista de hoje (modelo null): mantém o modelo; nada muda.
+  r = cg.atualizar({ modelo: null }, env);
+  assert.equal(r.mudou, false);
+  assert.equal(r.modelo, "opencode/glm-5.3-flash-free");
+
+  // Arquivo da pessoa na mesma pasta: não toca em nada.
+  fs.writeFileSync(path.join(pasta, "opencode.json"), "{}");
+  const antes = fs.readFileSync(alvo, "utf8");
+  r = cg.atualizar({ modelo: "opencode/beam-free" }, env);
+  assert.equal(r.mudou, false);
+  assert.equal(fs.readFileSync(alvo, "utf8"), antes);
+  assert.equal(fs.readFileSync(path.join(pasta, "opencode.json"), "utf8"), "{}");
+});

@@ -144,9 +144,34 @@ async function remover(st) {
   console.log(RECARREGAR);
 }
 
+// Atualização automática, usada pelo atalho do Desktop (decisão do mantenedor em 2026-11-08):
+// sem perguntar, mas SÓ no arquivo com a marca do repositório e nunca se houver arquivo da pessoa na pasta.
+// Atualiza as regras (vindas do repositório, após um 'git pull') e o modelo padrão (o melhor do dia que não treina).
+// Sem a lista de hoje (sem internet), mantém o modelo atual. Nunca cria o arquivo: isso exige 'aplicar'.
+export function atualizar(modeloDoDiaRes, env = process.env) {
+  const st = estado(env);
+  const nosso = st.arquivos.find((a) => a.existe && a.nosso);
+  if (!nosso) return { mudou: false, motivo: "não há configuração global do repositório; rode 'config-global aplicar' uma vez" };
+  if (st.arquivos.some((a) => a.existe && !a.nosso)) return { mudou: false, modelo: nosso.modelo, motivo: "há um arquivo seu na pasta global; nada foi alterado" };
+  const modelo = modeloDoDiaRes?.modelo || nosso.modelo;
+  if (nosso.atualizado && nosso.modelo === modelo) return { mudou: false, modelo, motivo: "já estava atualizada" };
+  const destino = path.join(st.pasta, "opencode.jsonc");
+  fs.writeFileSync(destino, texto(modelo));
+  if (nosso.file !== destino) fs.rmSync(nosso.file);
+  return { mudou: true, modelo, antes: nosso.modelo, regras: !nosso.atualizado, motivo: "atualizada" };
+}
+
+export function descreverAtualizacao(r) {
+  if (!r.mudou) return `Configuração global: ${r.motivo}${r.modelo ? ` (modelo padrão: ${r.modelo})` : ""}.`;
+  const partes = [];
+  if (r.antes !== r.modelo) partes.push(`modelo padrão ${r.antes || "nenhum"} → ${r.modelo || "nenhum"}`);
+  if (r.regras) partes.push("regras de segurança atualizadas");
+  return `Configuração global atualizada: ${partes.join("; ")}.`;
+}
+
 // Melhor modelo do dia que não treina, consultando 'opencode models' só com o provedor gratuito do OpenCode.
 // Sem OpenCode ou sem internet, nenhum modelo é gravado (o OpenCode usa o padrão dele).
-async function modeloDoDiaPadrao() {
+export async function modeloDoDiaPadrao() {
   const nuvem = await import("./nuvem.mjs");
   const opencode = await import("./opencode.mjs");
   const prefs = (await import("./preferencias.mjs")).load();
@@ -175,6 +200,11 @@ export async function run(args = [], { modeloDoDia = null } = {}) {
     return aplicar(st, () => md);
   }
   if (sub === "remover") return remover(st);
+  if (sub === "atualizar") {
+    const md = modeloDoDia ? await modeloDoDia() : await modeloDoDiaPadrao();
+    console.log(descreverAtualizacao(atualizar(md)));
+    return;
+  }
   warn(`Opção desconhecida: ${sub}`);
-  throw new UserError(`'config-global ${sub}' não existe.`, "Use: config-global [mostrar|aplicar|remover].");
+  throw new UserError(`'config-global ${sub}' não existe.`, "Use: config-global [mostrar|aplicar|atualizar|remover].");
 }

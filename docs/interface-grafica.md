@@ -1,6 +1,29 @@
 # Interface gráfica: OpenCode Desktop e interface web
 
-Situação em 2026-11-07: **possível, com limitações.** Análise feita na documentação e no código-fonte do OpenCode **2.2.6**; **ainda não executada** (ver [validacao.md](validacao.md)). O caminho validado continua sendo o terminal com `node scripts/ia-local.mjs iniciar`.
+Situação em 2026-11-08: **funciona no Windows 11, com limitações**, desde que a configuração global esteja aplicada (`config-global aplicar`). Testado no Windows 11 com o OpenCode 2.2.6: interface web e Desktop pediram aprovação para comandos de rede e para comandos que citam segredos, e abriram com o modelo padrão que não treina (ver [validacao.md](validacao.md)). Ubuntu: **não testado**. O caminho mais protegido continua sendo o terminal com `node scripts/ia-local.mjs iniciar`, que também limita os provedores ao modo escolhido.
+
+## Instalar o Desktop (Windows 11, testado em 2026-11-08)
+
+1. **Antes:** aplique a configuração global (`node scripts/ia-local.mjs config-global aplicar`, responda `s`) e rode `opencode service restart`.
+2. Baixe o instalador oficial: `https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-win-x64.exe` (ARM64: troque `x64` por `arm64`).
+3. Execute o instalador. **Resultado observado:** sem aviso do SmartScreen e **sem pedir administrador**; instala só para o seu usuário, em `%LOCALAPPDATA%\Programs\ai.opencode.desktop\`, e cria um atalho na área de trabalho. Se o Windows mostrar "Editor desconhecido", não continue.
+4. Ao abrir: **não faça login nem conecte conta** (os modelos gratuitos não precisam) e recuse acesso remoto.
+5. **Verifique:** o modelo selecionado deve ser o padrão gravado pelo `config-global` (que não treina); `opencode service status` deve continuar mostrando `127.0.0.1`.
+6. **Crie o atalho do repositório** (PowerShell, na pasta do repositório, sem administrador):
+
+   ```powershell
+   node scripts/ia-local.mjs desktop atalho
+   ```
+
+   Confirme com `s`. Aparece na Área de Trabalho o atalho **OpenCode (gratuito)**. **Use sempre ele** para abrir o Desktop: a cada abertura, o script atualiza **sem perguntar** o arquivo de configuração global criado pelo repositório (regras de segurança, que chegam com `git pull`, e o modelo padrão do dia que não treina) e depois abre o Desktop. O atalho original do OpenCode continua funcionando, mas sem essa atualização; para evitar confusão, você pode apagar o atalho original (o programa não é afetado).
+
+   - **Sem internet:** mantém o modelo atual e abre o Desktop.
+   - **Arquivo seu na pasta global:** nada é alterado; o Desktop abre mesmo assim.
+   - **Erro** (por exemplo, Desktop não encontrado): a janela fica aberta com a mensagem até você apertar Enter.
+   - **Efeito para quem usa:** abrir pelo atalho leva alguns segundos a mais (consulta a lista de modelos). Regras novas podem fazer o OpenCode pedir aprovação em mais situações.
+   - Sem o atalho: `node scripts/ia-local.mjs desktop` faz o mesmo. Para tirar o atalho: `node scripts/ia-local.mjs desktop remover-atalho`. Se mover a pasta do repositório, crie o atalho de novo.
+
+**Atualização:** o Desktop se atualiza sozinho e traz o próprio OpenCode embutido; a versão pode passar à frente da 2.2.6 do terminal. **Desinstalação:** em *Configurações → Aplicativos → Aplicativos instalados*, procure **OpenCode**. Configurações (`.config\opencode`) e sessões não são apagadas pelo desinstalador do programa; para tirar a configuração global, use `config-global remover`.
 
 ## Opções que o OpenCode oferece
 
@@ -86,7 +109,8 @@ Efeito colateral bom: o comando `opencode` aberto direto, sem o script, também 
 - `opencode pair --remote`, `opencode service set hostname 0.0.0.0` e `opencode serve --hostname 0.0.0.0`: expõem o OpenCode à rede ou à internet (ver [seguranca.md](seguranca.md#nunca-faça), item 8).
 - Conectar conta paga ou definir chaves de provedores pagos para "ter mais modelos" no Desktop.
 
-## Decisões do mantenedor (2026-11-07)
+## Decisões do mantenedor (2026-11-07 e 2026-11-08)
 
-1. **Recomendar ou não o Desktop aos colegas:** decidir **depois** da validação real (roteiro em [validacao.md](validacao.md#interface-gráfica-desktop-e-web)). Até lá, o caminho recomendado continua sendo o terminal com `iniciar`.
+1. **Recomendar o Desktop aos colegas:** sim, decidido em 2026-11-08 após a validação no Windows 11, para o **modo nuvem**, sempre com a configuração global aplicada e aberto pelo atalho **OpenCode (gratuito)**. O terminal (`iniciar`) continua sendo o caminho dos modos local e misto e o único que limita os provedores ao modo.
+3. **Atualização automática pelo atalho:** aprovada em 2026-11-08. O atalho atualiza sem perguntar só o arquivo com a marca do repositório (regras e modelo padrão que não treina); nunca cria o arquivo, nunca toca em arquivo da pessoa e não altera o código do OpenCode.
 2. **Configuração global por comando do script:** aprovado, para evitar erros de cópia manual. Implementado em `config-global`, com confirmação, sem tocar em arquivos da pessoa e sem regra de provedor (regra 5 do [CLAUDE.md](../CLAUDE.md) ajustada).

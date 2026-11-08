@@ -12,6 +12,7 @@ import * as opencode from "./opencode.mjs";
 import * as prefsMod from "./preferencias.mjs";
 import * as nuvem from "./nuvem.mjs";
 import * as configGlobal from "./configglobal.mjs";
+import * as desktop from "./desktop.mjs";
 
 const AJUDA = `
 Uso: node scripts/ia-local.mjs [comando] [opções]
@@ -30,9 +31,12 @@ Comandos:
                            --nao-confiavel ignora opencode.json, .opencode/ e AGENTS.md do projeto
                            (use em repositórios de terceiros). Veja docs/seguranca.md.
   status                   Mostra preferências, situação do modelo e caminhos dos arquivos locais.
-  config-global [mostrar|aplicar|remover]
+  config-global [mostrar|aplicar|atualizar|remover]
                            Proteções do script no OpenCode Desktop, na web e no 'opencode' sem o script
                            (com confirmação; nunca altera arquivo seu). Veja docs/interface-grafica.md.
+  desktop [atalho|remover-atalho]
+                           Atualiza a configuração global e abre o OpenCode Desktop (Windows);
+                           'atalho' cria na Área de Trabalho um atalho que faz isso a cada abertura.
   ajuda                    Mostra esta ajuda.
 
 Arquivos locais (fora do repositório): ${localDir()}
@@ -669,6 +673,7 @@ export async function main(argv) {
     iniciar: () => cmdIniciar(rest),
     status: cmdStatus,
     "config-global": () => configGlobal.run(rest),
+    desktop: () => desktop.run(rest),
     ajuda: async () => console.log(AJUDA),
     "--help": async () => console.log(AJUDA),
     "-h": async () => console.log(AJUDA),
