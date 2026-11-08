@@ -3,9 +3,12 @@
   "private": true,
   "description": "Instalação, seleção de modelo e uso do OpenCode 2 com modelos gratuitos em nuvem ou locais via Ollama (Windows 11 e Ubuntu 24.04).",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "ia-local": "node scripts/ia-local.mjs",
     "test": "node --test scripts/testes/ia-local.test.mjs"
-  }
+  },
+  "license": "MIT"
 }

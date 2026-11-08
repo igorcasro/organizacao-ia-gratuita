@@ -21,6 +21,7 @@ Situação em 2026-11-08: **funciona no Windows 11, com limitações**, desde qu
    - **Arquivo seu na pasta global:** nada é alterado; o Desktop abre mesmo assim.
    - **Erro** (por exemplo, Desktop não encontrado): a janela fica aberta com a mensagem até você apertar Enter.
    - **Efeito para quem usa:** abrir pelo atalho leva alguns segundos a mais (consulta a lista de modelos). Regras novas podem fazer o OpenCode pedir aprovação em mais situações.
+   - **Atualizar o repositório pelo Desktop:** digite `/atualizar-ia` na conversa. O comando roda `git pull` neste repositório e atualiza a configuração global; o modelo resume o que mudou. Não existe botão na barra do Desktop: acrescentar um exigiria modificar o OpenCode, e o Desktop se atualiza sozinho e desfaria a mudança.
    - Sem o atalho: `node scripts/ia-local.mjs desktop` faz o mesmo. Para tirar o atalho: `node scripts/ia-local.mjs desktop remover-atalho`. Se mover a pasta do repositório, crie o atalho de novo.
 
 **Atualização:** o Desktop se atualiza sozinho e traz o próprio OpenCode embutido; a versão pode passar à frente da 2.2.6 do terminal. **Desinstalação:** em *Configurações → Aplicativos → Aplicativos instalados*, procure **OpenCode**. Configurações (`.config\opencode`) e sessões não são apagadas pelo desinstalador do programa; para tirar a configuração global, use `config-global remover`.

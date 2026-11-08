@@ -29,6 +29,7 @@ O comando confere o modo escolhido e o OpenCode 2 e aplica as proteções de [se
 | Trocar de modelo | `/models` |
 | Desfazer a última alteração do agente | `/undo` |
 | Sair | **Ctrl+D** |
+| Atualizar este repositório (`git pull`) e a configuração global | `/atualizar-ia` (depois de `config-global aplicar`) |
 
 ## Agentes `build` e `plan`
 

@@ -13,6 +13,7 @@ import * as prefsMod from "./preferencias.mjs";
 import * as nuvem from "./nuvem.mjs";
 import * as configGlobal from "./configglobal.mjs";
 import * as desktop from "./desktop.mjs";
+import * as atualizarRepo from "./atualizar.mjs";
 
 const AJUDA = `
 Uso: node scripts/ia-local.mjs [comando] [opções]
@@ -37,6 +38,8 @@ Comandos:
   desktop [atalho|remover-atalho]
                            Atualiza a configuração global e abre o OpenCode Desktop (Windows);
                            'atalho' cria na Área de Trabalho um atalho que faz isso a cada abertura.
+  atualizar                Atualiza este repositório (git pull) e a configuração global. Dentro do
+                           OpenCode, o mesmo pelo comando /atualizar-ia (após 'config-global aplicar').
   ajuda                    Mostra esta ajuda.
 
 Arquivos locais (fora do repositório): ${localDir()}
@@ -674,6 +677,7 @@ export async function main(argv) {
     status: cmdStatus,
     "config-global": () => configGlobal.run(rest),
     desktop: () => desktop.run(rest),
+    atualizar: () => atualizarRepo.run(),
     ajuda: async () => console.log(AJUDA),
     "--help": async () => console.log(AJUDA),
     "-h": async () => console.log(AJUDA),

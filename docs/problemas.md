@@ -152,7 +152,7 @@ Atualizar é diferente de instalar a versão de referência. Primeiro confira em
 | Ollama | `$env:OLLAMA_VERSION = "<versão>"; irm https://ollama.com/install.ps1 \| iex` (sem a variável: última versão) | `curl -fsSL https://ollama.com/install.sh \| OLLAMA_VERSION=<versão> sh` |
 | OpenCode | `npm install -g @opencode/cli@<versão>` | igual |
 | Node.js | `winget upgrade --id OpenJS.NodeJS.LTS -e` | `nvm install 24` (traz a última 24.x) |
-| Este repositório | `git pull` | `git pull` |
+| Este repositório | `node scripts/ia-local.mjs atualizar` (ou `/atualizar-ia` dentro do OpenCode); faz `git pull --ff-only` e atualiza a configuração global. Se recusar, rode `git status`: há arquivos do repositório alterados neste computador | igual |
 | Modelo | `ollama pull <tag base>` e depois `selecionar` para recriar o derivado | igual |
 
 O OpenCode verifica atualizações e, por padrão, só avisa (`"update": "notify"`). O comando `opencode upgrade <versão>` também existe. Para manter a versão de referência, não aceite a atualização automática.

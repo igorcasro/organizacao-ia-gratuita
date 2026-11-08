@@ -26,7 +26,9 @@ Funciona no **Windows 11** e no **Ubuntu 24.04**. Para o modelo local, o reposit
 | GPU | Não precisa | Opcional: NVIDIA (CUDA), AMD (ROCm ou Vulkan), Intel e integradas (Vulkan) |
 | Disco | Algumas centenas de MB | Mais 4 a 19 GB por modelo |
 
-Versões de referência (consultadas em 2026-11-07): **OpenCode 2.2.6**, **Node.js 24 LTS** e, para o modelo local, **Ollama 0.40.15**. Situação dos testes em [docs/validacao.md](docs/validacao.md).
+Versões de referência (consultadas em 2026-11-07): **OpenCode 2.2.6**, **Node.js 24 LTS** e, para o modelo local, **Ollama 0.40.15**.
+
+**Situação dos testes:** a Parte A (modo nuvem), o OpenCode Desktop e o atalho foram **testados no Windows 11** em 2026-11-07 e 08. O **Ubuntu 24.04** e a Parte B (modelo local) **ainda não foram testados** num computador real. Detalhes em [docs/validacao.md](docs/validacao.md).
 
 ## Início rápido
 
@@ -45,7 +47,10 @@ Versões de referência (consultadas em 2026-11-07): **OpenCode 2.2.6**, **Node.
    node <caminho do repositório>/scripts/ia-local.mjs iniciar
    ```
 
-4. **Opcional:** para ter um modelo local (modos misto ou local), siga a **Parte B** do manual.
+4. **Windows, recomendado para o modo nuvem:** use o OpenCode Desktop (janela própria) pelo atalho **OpenCode (gratuito)**, que mantém as proteções e o modelo do dia atualizados. Passo A7 do [manual do Windows](docs/windows-11.md).
+5. **Opcional:** para ter um modelo local (modos misto ou local), siga a **Parte B** do manual.
+
+**Atualizar** (de tempos em tempos; correções de segurança e do catálogo de modelos chegam assim): dentro do OpenCode, digite **`/atualizar-ia`**, ou, no terminal, `node scripts/ia-local.mjs atualizar`. Os dois fazem `git pull` neste repositório e atualizam a configuração global. Nada é atualizado sem você pedir.
 
 Menu completo: `node scripts/ia-local.mjs`. Ajuda: `node scripts/ia-local.mjs ajuda`.
 **Instalação assistida por IA:** [docs/instalacao-assistida.md](docs/instalacao-assistida.md).
@@ -84,4 +89,4 @@ Os arquivos locais ficam em `%APPDATA%\ia-local` (Windows) ou `~/.config/ia-loca
 
 ## Licença
 
-Ainda não definida pelo mantenedor. Os modelos têm licenças próprias; veja [docs/modelos.md](docs/modelos.md).
+[MIT](LICENSE): use, copie, modifique e redistribua à vontade, mantendo o aviso de licença. O OpenCode, o Ollama e os modelos têm licenças próprias; veja [docs/modelos.md](docs/modelos.md).

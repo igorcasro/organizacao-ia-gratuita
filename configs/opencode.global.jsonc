@@ -146,7 +146,8 @@
     {"action": "shell", "resource": "*.docker*config.json*", "effect": "ask"},
     {"action": "shell", "resource": "*.kube*config*", "effect": "ask"}
   ],
-  // O config-global também grava "model": o melhor modelo do dia que não treina com seus dados.
+  // O config-global também grava "model" (o melhor modelo do dia que não treina com seus dados) e o comando
+  // "/atualizar-ia" (git pull deste repositório), que dependem do caminho do repositório em cada computador.
   // Regras de segurança entregues ao modelo em toda sessão.
   "instructions": ["<CAMINHO DO REPOSITÓRIO>/configs/instrucoes-seguranca.md"]
 }

@@ -6,7 +6,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { securityPermissions, SECURITY_INSTRUCTIONS } from "./opencode.mjs";
-import { confirm, nowIso, title, warn, UserError } from "./util.mjs";
+import { REPO_DIR, confirm, nowIso, title, warn, UserError } from "./util.mjs";
 
 export const MARCA = "Gerado por organizacao-ia-gratuita (node scripts/ia-local.mjs config-global)";
 export const ARQUIVOS = ["opencode.jsonc", "opencode.json"];
@@ -29,6 +29,21 @@ export function config(modelo = null) {
     permissions: securityPermissions(),
     // Barras normais: aceitas pelo Node.js no Windows e sem escapes no JSON.
     instructions: [SECURITY_INSTRUCTIONS.split(path.sep).join("/")],
+    // '/atualizar-ia' dentro do OpenCode (terminal, web ou Desktop) roda 'git pull' neste repositório.
+    // O bloco !`...` roda antes do pedido ser enviado, fora do fluxo de permissões (docs commands.mdx, v2.2.6);
+    // só a saída do comando (títulos dos commits) vai para o modelo.
+    commands: {
+      "atualizar-ia": {
+        description: "Atualiza o repositório organizacao-ia-gratuita (git pull) e a configuração global",
+        template: [
+          "A pessoa pediu para atualizar o repositório organizacao-ia-gratuita. O resultado do comando está abaixo.",
+          "Responda em português, em poucas linhas: diga se havia atualização, o que mudou (pelos títulos dos commits) e, se houve erro, o que fazer.",
+          "Não execute nenhum comando e não altere arquivos.",
+          "",
+          `!\`node "${path.join(REPO_DIR, "scripts", "ia-local.mjs").split(path.sep).join("/")}" atualizar\``,
+        ].join("\n"),
+      },
+    },
   };
 }
 

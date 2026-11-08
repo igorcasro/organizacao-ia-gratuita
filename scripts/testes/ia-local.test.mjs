@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { startOllamaMock, fakeBinaries } from "./simulador.mjs";
 
@@ -665,4 +665,49 @@ test("config-global atualizar: só no arquivo do repositório; modelo do dia; se
   assert.equal(r.mudou, false);
   assert.equal(fs.readFileSync(alvo, "utf8"), antes);
   assert.equal(fs.readFileSync(path.join(pasta, "opencode.json"), "utf8"), "{}");
+});
+
+test("atualizar: git pull só quando pedido, avança o repositório e não toca na configuração global sem marca", async () => {
+  const at = await import("../lib/atualizar.mjs");
+  const cg = await import("../lib/configglobal.mjs");
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-git-"));
+  const g = (cwd, ...args) => {
+    const r = spawnSync("git", ["-c", "user.name=t", "-c", "user.email=t@t", "-c", "init.defaultBranch=main", ...args], { cwd, encoding: "utf8" });
+    assert.equal(r.status, 0, r.stderr);
+    return r.stdout;
+  };
+  const origem = path.join(tmp, "origem.git");
+  g(tmp, "init", "-q", "--bare", origem);
+  const autor = path.join(tmp, "autor");
+  g(tmp, "clone", "-q", origem, autor);
+  fs.writeFileSync(path.join(autor, "a.txt"), "1");
+  g(autor, "add", ".");
+  g(autor, "commit", "-q", "-m", "inicial");
+  g(autor, "push", "-q", "origin", "HEAD:main");
+  const colega = path.join(tmp, "colega");
+  g(tmp, "clone", "-q", "-b", "main", origem, colega);
+  const xdg = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-xdg-"));
+  const env = { XDG_CONFIG_HOME: xdg };
+  const capturar = async (fn) => {
+    const linhas = [];
+    const orig = console.log;
+    console.log = (...a) => linhas.push(a.join(" "));
+    try { await fn(); } finally { console.log = orig; }
+    return linhas.join("\n");
+  };
+  let out = await capturar(() => at.run({ repoDir: colega, env, modeloDoDia: () => ({ modelo: null }) }));
+  assert.match(out, /já está na versão mais recente/);
+
+  fs.writeFileSync(path.join(autor, "a.txt"), "2");
+  g(autor, "commit", "-q", "-am", "Corrige regra de segurança");
+  g(autor, "push", "-q", "origin", "HEAD:main");
+  out = await capturar(() => at.run({ repoDir: colega, env, modeloDoDia: () => ({ modelo: null }) }));
+  assert.match(out, /1 atualização/);
+  assert.match(out, /Corrige regra de segurança/);
+  assert.equal(fs.readFileSync(path.join(colega, "a.txt"), "utf8"), "2");
+  assert.match(out, /rode 'config-global aplicar' uma vez/);
+  assert.ok(!fs.existsSync(path.join(xdg, "opencode")), "não cria a configuração global");
+
+  // O comando /atualizar-ia gravado na configuração global chama este script.
+  assert.match(cg.config().commands["atualizar-ia"].template, /!`node ".*scripts\/ia-local\.mjs" atualizar`/);
 });

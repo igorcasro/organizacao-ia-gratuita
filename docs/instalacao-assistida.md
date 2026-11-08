@@ -15,7 +15,7 @@ Você vai me conduzir na instalação do repositório "organizacao-ia-gratuita"
 
 Meu sistema: <Windows 11 | Ubuntu 24.04>
 Quem executa os comandos: <eu, e colo as saídas | você, pelo terminal>
-Objetivo: <só nuvem gratuita (Parte A) | nuvem + modelo local de reserva (Partes A e B) | só local (Parte B)>
+Objetivo: <só nuvem gratuita (Parte A) | nuvem + OpenCode Desktop no Windows (Parte A e Passo A7, recomendado) | nuvem + modelo local de reserva (Partes A e B) | só local (Parte B)>
 
 Siga EXATAMENTE o manual do meu sistema (docs/windows-11.md ou docs/ubuntu-24.04.md)
 e as regras de docs/instalacao-assistida.md. Leia também docs/seguranca.md antes de começar.
@@ -37,7 +37,9 @@ Regras principais:
 ## Regras para o assistente
 
 **Ordem**
-- Siga a ordem do manual: **Parte A** (Node.js, OpenCode, repositório, `modo`, `verificar`). A **Parte B** (Ollama e modelo local) só entra se o objetivo pedir. **Parte C** é manutenção.
+- Siga a ordem do manual: **Parte A** (Node.js, OpenCode, repositório, `modo`, `verificar`). No Windows, o **Passo A7** (Desktop e atalho) entra se o objetivo pedir. A **Parte B** (Ollama e modelo local) só entra se o objetivo pedir. **Parte C** é manutenção.
+- No Windows, use o **PowerShell** (de preferência no Windows Terminal). O OpenCode aberto pelo Git Bash teve problemas de tela (validação de 2026-11-07).
+- Se Node.js ou Git já estiverem instalados (Node.js 20 ou mais novo), não reinstale: pule para o passo seguinte.
 - Não pule a "Verificação" de nenhum passo. Se o resultado for diferente do esperado, pare e resolva antes de seguir.
 - Instale as **versões de referência** do manual (por exemplo, `@opencode/cli@2.2.6`), não "a mais recente".
 
@@ -48,7 +50,9 @@ Regras principais:
 | Instalar Node.js, Git, Ollama, pacotes do sistema | Autoriza a instalação (e a elevação, quando houver) |
 | `modo` | Escolhe o modo, decide liberar ou não cada provedor e **digita ela mesma** `concordo` depois de ler os avisos |
 | `selecionar` (Parte B) | Escolhe o modelo e autoriza o download (4 a 19 GB) |
+| `modo` (modelo padrão) | Escolhe **Automático** (recomendado: o melhor do dia que não treina com os dados) ou um modelo fixo, sabendo a classificação de privacidade |
 | `verificar` no modo nuvem | Autoriza ou não o pedido de teste ao modelo em nuvem |
+| `config-global aplicar` e `desktop atalho` (Passo A7) | Autoriza gravar a configuração global do OpenCode e criar o atalho na Área de Trabalho; o instalador do Desktop é executado pela pessoa |
 | Variáveis de ambiente (`OLLAMA_NO_CLOUD`, `OPENROUTER_API_KEY`) | Decide se define. **A chave do OpenRouter é digitada só pela pessoa** |
 
 **Proibido ao assistente**
@@ -68,12 +72,14 @@ Regras principais:
 
 | Ponto | Comando | Esperado |
 |---|---|---|
-| Node.js | `node --version` | `v24.x` (mínimo `v20`) |
+| Node.js | `node --version` | `v20` ou mais novo (referência: `v24.x`) |
 | OpenCode | `opencode --version` | `2.2.6` |
 | Repositório | `node scripts/ia-local.mjs ajuda` | Lista de comandos |
 | Modo | `node scripts/ia-local.mjs status` | `Modo: nuvem` (ou o escolhido) |
 | Verificação | `node scripts/ia-local.mjs verificar` | Todos os itens `[OK]` |
 | Fluxo | `node scripts/ia-local.mjs validar-fluxo` | 6 itens respondidos |
+| Configuração global (A7) | `node scripts/ia-local.mjs config-global` | `opencode.jsonc: gerado por este repositório; modelo padrão: opencode/...` |
+| Desktop (A7) | Abrir pelo atalho **OpenCode (gratuito)** e pedir `Execute o comando: curl.exe -sS https://example.com` | O OpenCode pede aprovação (rejeitar) |
 | Ollama (Parte B) | `ollama --version` e `curl http://127.0.0.1:11434/api/version` (Windows: `Invoke-RestMethod http://127.0.0.1:11434/api/version`) | `0.40.15` |
 | Modelo local (Parte B) | `node scripts/ia-local.mjs verificar --local` | Contexto carregado ≥ 65536 |
 
