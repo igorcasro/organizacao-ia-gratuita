@@ -127,7 +127,24 @@
     {"action": "shell", "resource": "gh *", "effect": "ask"},
     {"action": "shell", "resource": "*/gh *", "effect": "ask"},
     {"action": "shell", "resource": "gh.exe *", "effect": "ask"},
-    {"action": "shell", "resource": "*/gh.exe *", "effect": "ask"}
+    {"action": "shell", "resource": "*/gh.exe *", "effect": "ask"},
+    {"action": "shell", "resource": "*.env*", "effect": "ask"},
+    {"action": "shell", "resource": "*.pem*", "effect": "ask"},
+    {"action": "shell", "resource": "*.key*", "effect": "ask"},
+    {"action": "shell", "resource": "*.p12*", "effect": "ask"},
+    {"action": "shell", "resource": "*.pfx*", "effect": "ask"},
+    {"action": "shell", "resource": "*.kdbx*", "effect": "ask"},
+    {"action": "shell", "resource": "*id_rsa*", "effect": "ask"},
+    {"action": "shell", "resource": "*id_ed25519*", "effect": "ask"},
+    {"action": "shell", "resource": "*.ssh*", "effect": "ask"},
+    {"action": "shell", "resource": "*.aws*", "effect": "ask"},
+    {"action": "shell", "resource": "*.azure*", "effect": "ask"},
+    {"action": "shell", "resource": "*.gnupg*", "effect": "ask"},
+    {"action": "shell", "resource": "*.git-credentials*", "effect": "ask"},
+    {"action": "shell", "resource": "*.npmrc*", "effect": "ask"},
+    {"action": "shell", "resource": "*.pypirc*", "effect": "ask"},
+    {"action": "shell", "resource": "*.docker*config.json*", "effect": "ask"},
+    {"action": "shell", "resource": "*.kube*config*", "effect": "ask"}
   ],
   // O config-global também grava "model": o melhor modelo do dia que não treina com seus dados.
   // Regras de segurança entregues ao modelo em toda sessão.

@@ -40,6 +40,12 @@ export function redePatterns(programas = PROGRAMAS_REDE) {
 }
 const REDE = redePatterns();
 
+// Comandos que citam arquivos de segredos pedem aprovação. A regra "read" acima só vale para a ferramenta de
+// leitura do OpenCode; um comando como "Get-Content .env" ou "cat .env" passava livre (2026-11-08).
+// Melhor esforço: o texto do comando é comparado inteiro; formas indiretas (curingas, código montando o nome)
+// não são pegas, e há falsos positivos (ex.: "process.env" também pede aprovação).
+const SEGREDOS_SHELL = ["*.env*", "*.pem*", "*.key*", "*.p12*", "*.pfx*", "*.kdbx*", "*id_rsa*", "*id_ed25519*", "*.ssh*", "*.aws*", "*.azure*", "*.gnupg*", "*.git-credentials*", "*.npmrc*", "*.pypirc*", "*.docker*config.json*", "*.kube*config*"];
+
 export function securityPermissions() {
   return [
     { action: "webfetch", resource: "*", effect: "ask" },
@@ -48,6 +54,7 @@ export function securityPermissions() {
     ...SEGREDOS.map((r) => ({ action: "edit", resource: r, effect: "deny" })),
     { action: "read", resource: "*.env.example", effect: "allow" },
     ...REDE.map((r) => ({ action: "shell", resource: r, effect: "ask" })),
+    ...SEGREDOS_SHELL.map((r) => ({ action: "shell", resource: r, effect: "ask" })),
   ];
 }
 

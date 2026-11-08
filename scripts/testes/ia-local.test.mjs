@@ -615,3 +615,18 @@ test("comandos de rede pedem aprovação também com .exe, caminho completo e ma
     assert.ok(!rede.some((p) => match(c, p)), `não deveria pedir: ${c}`);
   }
 });
+
+test("comandos que citam arquivos de segredos pedem aprovação", async () => {
+  const { securityPermissions } = await import("../lib/opencode.mjs");
+  const regras = securityPermissions();
+  const match = (input, pattern) => {
+    let e = pattern.replaceAll("\\", "/").replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".");
+    if (e.endsWith(" .*")) e = e.slice(0, -3) + "( .*)?";
+    return new RegExp("^" + e + "$", "si").test(input.replaceAll("\\", "/"));
+  };
+  const efeito = (cmd) => regras.filter((r) => r.action === "shell" && match(cmd, r.resource)).pop()?.effect ?? "padrão";
+  for (const c of ["Get-Content .env", "cat .env.local", "type C:\\Users\\x\\.ssh\\id_ed25519", "Get-Content ~/.aws/credentials", "cat server.pem", "more .npmrc"]) {
+    assert.equal(efeito(c), "ask", c);
+  }
+  for (const c of ["npm test", "git diff", "Get-Content src/calculadora.mjs"]) assert.equal(efeito(c), "padrão", c);
+});
