@@ -527,3 +527,50 @@ test("exemplo de configuração global: mesmas permissões do script e nenhuma r
   assert.ok(json.policies.some((p) => p.action === "websearch.use" && p.effect === "deny"));
   assert.match(json.instructions[0], /configs\/instrucoes-seguranca\.md$/);
 });
+
+test("config-global: grava com confirmação, não toca em arquivo da pessoa e remove só o próprio", async () => {
+  const cg = await import("../lib/configglobal.mjs");
+  const xdg = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-xdg-"));
+  const env = { IA_LOCAL_HOME: tmpHome(), XDG_CONFIG_HOME: xdg, OPENCODE_CONFIG_DIR: "" };
+  const pasta = path.join(xdg, "opencode");
+  const alvo = path.join(pasta, "opencode.jsonc");
+
+  // Mesmo conteúdo do exemplo versionado e nenhuma regra de provedor.
+  const exemplo = fs.readFileSync(path.join(ROOT, "configs", "opencode.global.jsonc"), "utf8");
+  const ex = JSON.parse(exemplo.split(/\r?\n/).filter((l) => !/^\s*\/\//.test(l)).join("\n"));
+  const cfg = cg.config();
+  assert.deepEqual(cfg.permissions, ex.permissions);
+  assert.deepEqual(cfg.policies, ex.policies);
+  assert.ok(!cg.texto().includes("provider.use"));
+  assert.ok(!cfg.instructions[0].includes("\\"), "barras normais no caminho");
+
+  // Recusar a confirmação não grava nada.
+  let r = await runCli(["config-global", "aplicar"], { env, input: "n\n" });
+  assert.match(r.out, /Nada foi alterado/);
+  assert.ok(!fs.existsSync(alvo));
+
+  // Confirmando, grava; repetir não muda nada.
+  r = await runCli(["config-global", "aplicar"], { env, input: "s\n" });
+  assert.equal(r.code, 0, r.out);
+  assert.ok(fs.readFileSync(alvo, "utf8").includes(cg.MARCA));
+  JSON.parse(fs.readFileSync(alvo, "utf8").split(/\r?\n/).filter((l) => !/^\s*\/\//.test(l)).join("\n"));
+  r = await runCli(["config-global", "aplicar"], { env, input: "" });
+  assert.match(r.out, /já está aplicada/);
+
+  // Remover renomeia (não apaga).
+  r = await runCli(["config-global", "remover"], { env, input: "s\n" });
+  assert.ok(!fs.existsSync(alvo));
+  assert.ok(fs.readdirSync(pasta).some((n) => n.startsWith("opencode.jsonc.removido-")));
+
+  // Arquivo da pessoa: aplicar recusa e remover não toca.
+  const seu = path.join(pasta, "opencode.json");
+  const conteudo = '{ "policies": [{ "action": "provider.use", "resource": "*", "effect": "deny" }] }';
+  fs.writeFileSync(seu, conteudo);
+  r = await runCli(["config-global", "aplicar"], { env, input: "s\n" });
+  assert.equal(r.code, 1);
+  assert.match(r.out, /arquivo seu/);
+  assert.match(r.out, /regra de provedor/);
+  r = await runCli(["config-global", "remover"], { env, input: "s\n" });
+  assert.equal(fs.readFileSync(seu, "utf8"), conteudo);
+  assert.ok(!fs.existsSync(alvo));
+});

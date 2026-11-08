@@ -121,6 +121,16 @@ Modelos locais erram mais: respondem em texto em vez de editar, inventam nomes d
 | "variável OPENROUTER_API_KEY não definida" | Defina a chave como em [nuvem-gratuita.md](nuvem-gratuita.md#2-openrouter-somente-variantes-free-opcional) e abra um terminal novo |
 | Sem internet | O modo nuvem não funciona offline. Use `modo` → `local` (precisa do Ollama e de um modelo baixado) |
 
+## Acentos trocados na saída de comandos (Windows)
+
+**Sintoma:** quando o agente lê um arquivo por comando (por exemplo, `Get-Content`), os acentos aparecem como `�` ou `Ã§`. Observado em 2026-11-07 no Windows 11.
+
+**Causa provável:** no Windows, o OpenCode usa o PowerShell 7 (`pwsh`) se estiver instalado e, senão, o Windows PowerShell 5.1 (`packages/core/src/shell/select.ts`, v2.2.6). O 5.1 lê arquivos UTF-8 sem BOM como se fossem da codificação antiga do Windows. **Pendente:** confirmar qual dos dois estava em uso.
+
+**Efeito:** só na saída do comando. Os arquivos não são alterados, e a ferramenta de leitura do próprio OpenCode não tem esse problema. O modelo costuma entender mesmo assim.
+
+**O que fazer:** nada é obrigatório. Se atrapalhar, peça ao agente para ler o arquivo com a ferramenta de leitura em vez de comando, ou para usar `Get-Content -Encoding UTF8`. Instalar o PowerShell 7 provavelmente resolve, mas ainda não foi testado aqui.
+
 ## Bloqueios das proteções de segurança
 
 | Sintoma | Explicação e saída |

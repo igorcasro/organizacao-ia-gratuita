@@ -12,18 +12,18 @@ Permitir que pessoas diferentes, em computadores diferentes (Windows 11 ou Ubunt
 2. **Ollama não é exposto à rede.** Não definir `OLLAMA_HOST=0.0.0.0` em nenhum script ou manual como passo padrão.
 3. **Nada pessoal no repositório.** Preferências, diagnósticos, caminhos particulares, logs, credenciais e modelos ficam fora (ver `.gitignore` e `scripts/lib/util.mjs → localDir()`).
 4. **Confirmação antes de baixar.** Nenhum download de modelo sem confirmação explícita. Nunca baixar o catálogo inteiro.
-5. **Não alterar o sistema sem pedido.** Scripts não instalam programas, não alteram serviços e não editam configurações globais do OpenCode. A janela de contexto é ajustada com um modelo derivado (`ollama create`), não com variáveis de serviço.
+5. **Não alterar o sistema sem pedido.** Scripts não instalam programas, não alteram serviços e não editam configurações globais do OpenCode — com uma exceção decidida pelo mantenedor em 2026-11-07: o comando `config-global`, que pede confirmação, só grava ou renomeia o arquivo que tem a marca do repositório (nunca um arquivo da pessoa) e nunca inclui regra de provedor. A janela de contexto é ajustada com um modelo derivado (`ollama create`), não com variáveis de serviço.
 6. **Não inventar.** Comandos, opções, requisitos e resultados precisam de fonte oficial (registre em `docs/fontes.md` com data) ou ficam marcados como pendência.
 7. **Diferenciar estados.** Instalado ≠ verificado tecnicamente ≠ validado no fluxo de programação. Estimativa ≠ medição. Confirmado em documentação ≠ testado.
 
 ## Estrutura
 
 - `scripts/ia-local.mjs` — ponto de entrada (Node.js ≥ 20, sem dependências externas).
-- `scripts/lib/` — módulos: `nuvem` (modos e catálogo de nuvem gratuita), `diagnostico`, `gpu` (NVIDIA/AMD/Intel, dedicada × integrada), `catalogo` (regras de recomendação), `ollama` (API HTTP + CLI), `opencode`, `preferencias`, `comandos` (menu), `util`.
+- `scripts/lib/` — módulos: `nuvem` (modos e catálogo de nuvem gratuita), `diagnostico`, `gpu` (NVIDIA/AMD/Intel, dedicada × integrada), `catalogo` (regras de recomendação), `ollama` (API HTTP + CLI), `opencode`, `preferencias`, `configglobal` (comando `config-global`), `comandos` (menu), `util`.
 - `scripts/testes/` — testes com Ollama e OpenCode simulados. Executar: `node --test scripts/testes/ia-local.test.mjs` (ou `npm test`).
 - `catalogo/modelos.json` — modelos locais (validado por `catalogo.validate`); `catalogo/nuvem-gratuita.json` — provedores e modelos gratuitos em nuvem (validado por `nuvem.validate`).
 - `configs/instrucoes-seguranca.md` — regras de segurança entregues ao modelo em toda sessão; mudanças nele afetam todos os usuários.
-- `configs/` — exemplos; nunca são aplicados automaticamente. `configs/opencode.global.jsonc` leva as proteções independentes de modo ao Desktop e à interface web e **não pode ter regra de provedor** (políticas globais vencem as do script; ver docs/interface-grafica.md). Se mudar `securityPermissions()`, atualize-o (o teste avisa).
+- `configs/` — exemplos; nunca são aplicados automaticamente. `configs/opencode.global.jsonc` leva as proteções independentes de modo ao Desktop e à interface web e **não pode ter regra de provedor** (políticas globais vencem as do script; ver docs/interface-grafica.md). Se mudar `securityPermissions()`, atualize-o (o teste avisa); o conteúdo gravado pelo `config-global` vem de `configglobal.config()`.
 - `exemplos/projeto-validacao/` — projeto descartável do roteiro de validação.
 - `docs/` — manuais e referências.
 

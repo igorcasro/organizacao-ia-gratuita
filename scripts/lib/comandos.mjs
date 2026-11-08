@@ -11,6 +11,7 @@ import * as ollama from "./ollama.mjs";
 import * as opencode from "./opencode.mjs";
 import * as prefsMod from "./preferencias.mjs";
 import * as nuvem from "./nuvem.mjs";
+import * as configGlobal from "./configglobal.mjs";
 
 const AJUDA = `
 Uso: node scripts/ia-local.mjs [comando] [opções]
@@ -29,6 +30,9 @@ Comandos:
                            --nao-confiavel ignora opencode.json, .opencode/ e AGENTS.md do projeto
                            (use em repositórios de terceiros). Veja docs/seguranca.md.
   status                   Mostra preferências, situação do modelo e caminhos dos arquivos locais.
+  config-global [mostrar|aplicar|remover]
+                           Proteções do script no OpenCode Desktop, na web e no 'opencode' sem o script
+                           (com confirmação; nunca altera arquivo seu). Veja docs/interface-grafica.md.
   ajuda                    Mostra esta ajuda.
 
 Arquivos locais (fora do repositório): ${localDir()}
@@ -575,6 +579,7 @@ async function menu() {
     ["Validar fluxo de programação (roteiro)", cmdValidarFluxo],
     ["Iniciar OpenCode na pasta atual", () => cmdIniciar([])],
     ["Status e caminhos", cmdStatus],
+    ["Configuração global (Desktop e web)", () => configGlobal.run(["mostrar"])],
     ["Sair", null],
   ];
   while (true) {
@@ -612,6 +617,7 @@ export async function main(argv) {
     "validar-fluxo": cmdValidarFluxo,
     iniciar: () => cmdIniciar(rest),
     status: cmdStatus,
+    "config-global": () => configGlobal.run(rest),
     ajuda: async () => console.log(AJUDA),
     "--help": async () => console.log(AJUDA),
     "-h": async () => console.log(AJUDA),

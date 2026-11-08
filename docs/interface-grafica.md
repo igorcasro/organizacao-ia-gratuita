@@ -46,17 +46,37 @@ Como as políticas globais vencem as do script, qualquer regra de provedor na co
 
 Sem regra global de provedor, o `iniciar` continua restringindo cada modo como antes. No Desktop, aparecem os modelos gratuitos do OpenCode (sem conta) e os do Ollama, se ele estiver aberto. **A escolha do modelo, e portanto se o código vai para a nuvem, fica com você em `/models`.** Não há troca automática.
 
-## Como aplicar (opcional, manual)
+## Como aplicar (opcional)
 
-Os scripts não alteram a configuração global do OpenCode (regra 5 do [CLAUDE.md](../CLAUDE.md)); a cópia é feita pela própria pessoa.
+### Pelo script (recomendado)
 
-1. **Descubra a pasta** (PowerShell ou Git Bash, qualquer diretório, sem administrador): `opencode debug paths config`.
-2. **Se já existir** `opencode.json` ou `opencode.jsonc` nela, faça uma cópia de segurança (ex.: `opencode.jsonc.bak`) e junte as regras à mão, em vez de substituir.
-3. **Copie** [`configs/opencode.global.jsonc`](../configs/opencode.global.jsonc) para essa pasta com o nome `opencode.jsonc` e troque `<CAMINHO DO REPOSITÓRIO>` pela pasta deste repositório, **com barras normais** (`C:/Users/fulano/projetos/organizacao-ia-gratuita`).
-4. **Recarregue:** `opencode reload` (ou feche e abra o Desktop).
-5. **Confira:** veja o roteiro em [validacao.md](validacao.md#interface-gráfica-desktop-e-web).
+- **Onde:** PowerShell ou Git Bash (Windows) / terminal (Ubuntu). **Diretório:** a pasta deste repositório. **Administrador/sudo:** não (a pasta é do seu usuário).
 
-Para desfazer: apague o `opencode.jsonc` copiado ou restaure a cópia de segurança, e rode `opencode reload`.
+```bash
+node scripts/ia-local.mjs config-global            # mostra a pasta e o que já existe
+node scripts/ia-local.mjs config-global aplicar    # mostra o efeito e pede confirmação
+```
+
+O comando:
+- grava `opencode.jsonc` na pasta global, com uma marca de que foi gerado pelo repositório;
+- **recusa** gravar se já houver um `opencode.json` ou `opencode.jsonc` seu nessa pasta (não mistura configurações; avisa também se o seu arquivo tiver regra de provedor, que bloquearia modos);
+- ao atualizar a própria versão, guarda uma cópia (`opencode.jsonc.bak-<data>`);
+- aponta as instruções de segurança para esta pasta do repositório. Se você mover ou apagar o repositório, rode `aplicar` de novo.
+
+**Resultado esperado:** `Gravado: ...\.config\opencode\opencode.jsonc`. **Verificação:** `opencode debug paths config` deve mostrar a mesma pasta; depois, `opencode reload` (ou feche e abra o Desktop) e siga o roteiro em [validacao.md](validacao.md#interface-gráfica-desktop-e-web).
+
+**Para desfazer:** `node scripts/ia-local.mjs config-global remover` (pede confirmação e só renomeia o arquivo gerado pelo repositório para `opencode.jsonc.removido-<data>`; arquivos seus nunca são tocados). Depois, `opencode reload`.
+
+**Falhas comuns:**
+- *"Já existe um arquivo seu..."*: junte à mão (abaixo) ou mova o seu arquivo para outro nome, se não precisar dele.
+- A pasta mostrada pelo script é diferente da de `opencode debug paths config`: não use o comando; aplique à mão na pasta do OpenCode e registre o caso em [validacao.md](validacao.md).
+
+### À mão (quando você já tem um arquivo de configuração global)
+
+1. Descubra a pasta: `opencode debug paths config`.
+2. Faça uma cópia de segurança do seu `opencode.json`/`opencode.jsonc` (ex.: `opencode.jsonc.bak`).
+3. Junte ao seu arquivo as regras de [`configs/opencode.global.jsonc`](../configs/opencode.global.jsonc), trocando `<CAMINHO DO REPOSITÓRIO>` pela pasta deste repositório, **com barras normais** (`C:/Users/fulano/projetos/organizacao-ia-gratuita`). Não acrescente regras de provedor (`provider.use`).
+4. `opencode reload` (ou feche e abra o Desktop).
 
 Efeito colateral bom: o comando `opencode` aberto direto, sem o script, também passa a ter essas proteções.
 
@@ -65,7 +85,7 @@ Efeito colateral bom: o comando `opencode` aberto direto, sem o script, também 
 - `opencode pair --remote`, `opencode service set hostname 0.0.0.0` e `opencode serve --hostname 0.0.0.0`: expõem o OpenCode à rede ou à internet (ver [seguranca.md](seguranca.md#nunca-faça), item 8).
 - Conectar conta paga ou definir chaves de provedores pagos para "ter mais modelos" no Desktop.
 
-## Decisões pendentes do mantenedor
+## Decisões do mantenedor (2026-11-07)
 
-1. **Recomendar ou não o Desktop aos colegas** depois da validação, sabendo que ele não fixa a versão nem limita os provedores por modo.
-2. **Se um comando do script deve escrever a configuração global** (com confirmação e cópia de segurança). Hoje isso contraria a regra 5 do `CLAUDE.md`; a decisão muda essa regra.
+1. **Recomendar ou não o Desktop aos colegas:** decidir **depois** da validação real (roteiro em [validacao.md](validacao.md#interface-gráfica-desktop-e-web)). Até lá, o caminho recomendado continua sendo o terminal com `iniciar`.
+2. **Configuração global por comando do script:** aprovado, para evitar erros de cópia manual. Implementado em `config-global`, com confirmação, sem tocar em arquivos da pessoa e sem regra de provedor (regra 5 do [CLAUDE.md](../CLAUDE.md) ajustada).

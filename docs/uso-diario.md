@@ -20,6 +20,16 @@ O comando confere o modo escolhido e o OpenCode 2 e aplica as proteções de [se
 
 **Primeira vez num projeto:** o OpenCode 2 lê instruções do arquivo `AGENTS.md` na raiz do projeto (ele **não** lê `CLAUDE.md`). Vale criar um, curto, com comandos de build e teste e convenções do código. Você pode pedir ao próprio OpenCode um rascunho, mas com modelo local revise o resultado antes de confiar nele.
 
+## Teclas úteis
+
+| Ação | Tecla |
+|---|---|
+| Alternar entre `plan` e `build` | **Shift+Tab** (a interface mostra "shift+tab agents") |
+| Nova linha sem enviar | **Ctrl+J**. A documentação também cita Shift+Enter, Ctrl+Enter e Alt+Enter, mas **Shift+Enter não funcionou no Windows Terminal** (2026-11-07); muitos terminais não distinguem Shift+Enter de Enter |
+| Trocar de modelo | `/models` |
+| Desfazer a última alteração do agente | `/undo` |
+| Sair | **Ctrl+D** |
+
 ## Agentes `build` e `plan`
 
 O OpenCode tem dois agentes principais. Para alternar: **Shift+Tab**, ou **Ctrl+X** e depois **A**, ou o comando `/agents`.
@@ -75,7 +85,7 @@ Se preferir chamar o OpenCode diretamente, o caminho oficial do Ollama é:
 ollama launch opencode --model ia-local-<id>:64k
 ```
 
-Nesse caso as políticas e permissões do script **não** são aplicadas. Para ter ao menos as políticas de provedor e de busca na web, copie o exemplo do seu modo — [`configs/opencode.somente-local.jsonc`](../configs/opencode.somente-local.jsonc) (local) ou [`configs/opencode.nuvem-gratuita.jsonc`](../configs/opencode.nuvem-gratuita.jsonc) (nuvem; para o misto, descomente a linha do `ollama`) — para a pasta de configuração do OpenCode (mostrada por `opencode debug paths config`). **Atenção:** na pasta global, as regras de provedor desses exemplos passam a valer também para o script e bloqueiam os outros modos. Se você usa mais de um modo, prefira [`configs/opencode.global.jsonc`](../configs/opencode.global.jsonc) (ver [interface-grafica.md](interface-grafica.md)). Antes, faça uma cópia de qualquer `opencode.json`/`opencode.jsonc` que já exista lá.
+Nesse caso as políticas e permissões do script **não** são aplicadas. Para ter ao menos as políticas de provedor e de busca na web, copie o exemplo do seu modo — [`configs/opencode.somente-local.jsonc`](../configs/opencode.somente-local.jsonc) (local) ou [`configs/opencode.nuvem-gratuita.jsonc`](../configs/opencode.nuvem-gratuita.jsonc) (nuvem; para o misto, descomente a linha do `ollama`) — para a pasta de configuração do OpenCode (mostrada por `opencode debug paths config`). **Atenção:** na pasta global, as regras de provedor desses exemplos passam a valer também para o script e bloqueiam os outros modos. Se você usa mais de um modo, prefira `node scripts/ia-local.mjs config-global aplicar` (ver [interface-grafica.md](interface-grafica.md)). Antes, faça uma cópia de qualquer `opencode.json`/`opencode.jsonc` que já exista lá.
 
 Para o OpenCode Desktop e a interface web, veja [interface-grafica.md](interface-grafica.md): eles não recebem as proteções do script, e a configuração global só leva parte delas.
 

@@ -1,6 +1,7 @@
 // Configuração GLOBAL do OpenCode 2 com as proteções que não dependem do modo.
 // Serve para que o OpenCode Desktop, a interface web (opencode pair) e o comando "opencode" puro
 // tenham as mesmas proteções do script. Leia docs/interface-grafica.md antes de usar.
+// Prefira gravar com:  node scripts/ia-local.mjs config-global aplicar  (este arquivo é para juntar à mão).
 //
 // Destino: opencode.jsonc na pasta mostrada por  opencode debug paths config
 //   Windows: C:\Users\<seu usuário>\.config\opencode\opencode.jsonc   Ubuntu: ~/.config/opencode/opencode.jsonc

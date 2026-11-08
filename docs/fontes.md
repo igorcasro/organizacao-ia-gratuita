@@ -13,16 +13,17 @@ Todas consultadas em **2026-11-07**. Quando a fonte foi o repositório oficial, 
 | Políticas (`provider.use`, `websearch.use`, ordem) | `services/site/src/docs/content/policies.mdx` |
 | Migração V1 → V2 (formatos, mesmo comando `opencode`) | https://opencode.ai/docs/migrate-v1 — `migrate-v1.mdx` |
 | CLI: `--standalone`, `run`, `mini`, `uninstall`, `debug paths` | `services/site/src/docs/content/cli/index.mdx`, `cli/commands.mdx` |
-| TUI: agentes (Shift+Tab, `/agents`), `/models`, anexar arquivo com `@` | `cli/tui.mdx`; agentes `build`/`plan`: `agents.mdx` |
+| TUI: agentes (Shift+Tab, `/agents`), `/models`, anexar arquivo com `@`, nova linha (Shift/Ctrl/Alt+Enter, Ctrl+J) | `cli/tui.mdx`; agentes `build`/`plan`: `agents.mdx` |
 | `/undo` e snapshots | `snapshots.mdx` |
 | `AGENTS.md` (V2 não lê `CLAUDE.md`) | `instructions.mdx` |
 | Solução de problemas (`opencode service ...`) | `troubleshooting.mdx` |
 | Variáveis `OPENCODE_CONFIG`, `OPENCODE_CONFIG_CONTENT`, `OPENCODE_DISABLE_FREE_MODELS` | `packages/cli/src/server-process.ts`, `packages/core/src/config.ts`, `packages/core/src/model.ts` |
 | Opções da linha de comando (a interface principal não tem `--model`) | `packages/cli/src/commands/commands.ts` |
-| Shell usado no Windows | `packages/core/src/shell/select.ts` |
+| Shell usado no Windows (ordem: `pwsh`, `powershell`, Git Bash, `cmd`) | `packages/core/src/shell/select.ts` |
 | Desktop, web (`opencode pair`) e ACP | `index.mdx` (seções *Desktop* e *Web*), `cli/web.mdx`, `cli/acp.mdx` |
 | Serviço compartilhado em segundo plano | `cli/index.mdx` (*Background service*), `cli/commands.mdx` (`service`, `reload`); `packages/desktop/src/main/service/background-service.ts` e `desktop-cli.ts` |
-| Pasta global de configuração (inclusive no Windows) | `packages/util/src/global-roots.ts`, `packages/util/src/global.ts` |
+| Pasta global de configuração (inclusive no Windows; `XDG_CONFIG_HOME` e `OPENCODE_CONFIG_DIR`) | `packages/util/src/global-roots.ts`, `packages/util/src/global.ts` |
+| `opencode reload` (recarrega a configuração sem reiniciar o servidor) | `cli/commands.mdx` (*reload*) |
 | Ordem de carga das configurações e precedência das políticas | `packages/core/src/config.ts`, `packages/core/src/config/plugin/policy.ts`; `policies.mdx` (*Precedence*) |
 | Desktop lê só `opencode.json(c)` | `build/plugins/gui/index.mdx` |
 | Documentação do V1 (para comparação; não usar nos manuais) | `packages/web/src/content/docs/index.mdx` |

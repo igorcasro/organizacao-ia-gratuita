@@ -144,6 +144,8 @@ Sem Ollama, sem download de modelos e sem exigência de hardware. Exige internet
   ```
 
 - **Resultado esperado:** a interface do OpenCode abre com o modelo do modo escolhido: o gratuito em nuvem (modos nuvem e misto) ou `ollama/ia-local-<id>:64k` (modo local).
+- **Terminal:** abra o OpenCode no **PowerShell** (de preferência no Windows Terminal). Em 2026-11-07, com o Git Bash aberto a partir do PowerShell, a resposta ficava rolando dentro da área do OpenCode e o cursor sumia; no PowerShell, tudo normal. O Git Bash serve para os demais comandos do script.
+- **Teclas:** trocar entre `plan` e `build` com **Shift+Tab**. Nova linha sem enviar: **Ctrl+J** (no Windows Terminal, Shift+Enter não funcionou).
 - Mais exemplos e boas práticas: [uso-diario.md](uso-diario.md).
 
 

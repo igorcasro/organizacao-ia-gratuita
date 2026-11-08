@@ -58,11 +58,15 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | `ajuda`, `modo` (nuvem, só `opencode`, `concordo`, modelo sugerido), `status` | Testado |
 | `verificar`: OpenCode 2, consentimento, chaves, `opencode models` com 11 modelos, só o provedor `opencode`, `deepseek-v4.1-flash-free` disponível | Testado |
 | `npm test` no Windows: 19 passaram e 2 falharam (os testes de `/sys` do Linux criam pastas com `:`, nome proibido no Windows). Esses 2 passam a ser pulados no Windows, como os 9 de CLI (executáveis falsos em `sh`). Resultado esperado no Windows: **19 passam, 11 pulados, 0 falhas**; no Linux, 30 de 30 | Corrigido; reteste pendente |
+| A6 em projeto real (bot de Telegram em Python, ~60 arquivos), PowerShell, agente `plan`, pedido "explique a estrutura": o agente listou e leu os arquivos e entregou um mapa completo e correto dos módulos, sem editar nada | Testado (avaliação da pessoa) |
+| Trocar para `plan`: **Shift+Tab** (o manual dizia Tab numa orientação dada na conversa; os documentos já diziam Shift+Tab) | Testado |
+| Nova linha com Shift+Enter **não funciona** no Windows Terminal; documentada a alternativa **Ctrl+J** (doc `cli/tui.mdx`) | Shift+Enter testado; Ctrl+J pendente |
+| Acentos trocados na saída de `Get-Content` executado pelo agente (provável Windows PowerShell 5.1); ver problemas.md | Observado; causa pendente |
 | `verificar` após a correção do `PWD`: pedido de teste respondido `OK`; verificado tecnicamente | Testado |
 | `validar-fluxo` no modo nuvem com `deepseek-v4.1-flash-free`: inicialização, leitura, explicação, alteração, teste e reversão — **6 de 6** | Testado (avaliação da pessoa) |
 | Comando `npm test` executado pelo agente **sem pedir aprovação**: está de acordo com as permissões geradas (só comandos de rede pedem). O roteiro dizia "após sua permissão"; texto corrigido | Testado |
 | Antes de reverter (ação destrutiva), o agente pediu confirmação na conversa. Não se sabe se veio de uma permissão do OpenCode ou das instruções de segurança | Observado; origem pendente |
-| Interface do OpenCode no Git Bash: a resposta rola dentro da área do OpenCode e não pôde ser lida por inteiro; o cursor de texto não aparece | Problema observado com o Git Bash aberto a partir do PowerShell; comparação com o OpenCode aberto direto no PowerShell pendente |
+| Interface do OpenCode no Git Bash: a resposta rola dentro da área do OpenCode e não pôde ser lida por inteiro; o cursor de texto não aparece | Problema observado com o Git Bash aberto a partir do PowerShell; **no PowerShell, rolagem e cursor normais** (testado em 2026-11-07). Manual recomenda o PowerShell para abrir o OpenCode |
 | `verificar`: pedido de teste falhou no Git Bash com *"Failed to change directory to /c/Users/..."*: o OpenCode recebia a variável `PWD` no formato MSYS. Corrigido em `util.childEnv` (o `PWD` do processo filho passa a ser a pasta real, no formato do Windows) | Corrigido; reteste pendente |
 
 ## Confirmado em documentação ou código, não executado
@@ -123,13 +127,16 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Desktop traz o próprio OpenCode embutido e se atualiza: a versão não fica fixa em 2.2.6 | Confirmado (código `packages/desktop/src/main/service/desktop-cli.ts`); versão real pendente |
 | Efeito real no Desktop e na web: permissões pedidas, segredos bloqueados, busca na web bloqueada, instruções carregadas, só modelos gratuitos sem conta | **Pendente** (roteiro abaixo) |
 | `instructions` com caminho absoluto do Windows em barras normais (`C:/...`) | **Pendente** |
+| Comando `config-global` (mostrar, aplicar com confirmação, não repetir, remover renomeando, recusar arquivo da pessoa e avisar sobre regra de provedor) | Testado com teste automatizado (Linux, pasta temporária via `XDG_CONFIG_HOME`); no Windows real, **pendente** |
+| A pasta calculada pelo `config-global` é a mesma de `opencode debug paths config` | **Pendente** (conferir no Windows e no Ubuntu) |
 
 **Roteiro (num computador sem dados importantes no OpenCode):**
-1. Aplique a configuração global como em [interface-grafica.md](interface-grafica.md#como-aplicar-opcional-manual).
+1. Rode `node scripts/ia-local.mjs config-global` e compare a pasta mostrada com `opencode debug paths config`; depois `config-global aplicar` e `opencode reload` ([interface-grafica.md](interface-grafica.md#como-aplicar-opcional)).
 2. No terminal, sem o script: `opencode` dentro de uma cópia de `exemplos/projeto-validacao`. Peça "busque na web a versão do Node.js" (deve recusar), "leia o arquivo .env" (crie um `.env` falso antes; deve ser negado) e "rode curl https://example.com" (deve pedir aprovação; recuse).
 3. Repita os mesmos pedidos no Desktop e em `opencode pair` (link local).
 4. Em `/models` (ou no seletor do Desktop), anote se aparecem só modelos gratuitos e os do Ollama.
 5. Anote a versão do OpenCode embutida no Desktop (tela *Sobre* ou *Settings*).
+6. Rode `config-global remover`, `opencode reload` e confira que o pedido de busca na web volta a ser possível no `opencode` sem o script (prova de que era a configuração global que bloqueava).
 
 ## Pendente de validação
 
