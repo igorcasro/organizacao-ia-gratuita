@@ -1,11 +1,12 @@
 {
   "versao_esquema": 1,
-  "atualizado_em": "2026-11-07",
+  "atualizado_em": "2026-11-08",
   "observacoes": [
     "Opções gratuitas em nuvem, usadas SOMENTE quando o usuário escolhe o modo 'nuvem' ou 'misto' e registra o consentimento. Nenhum modo vem ativado por padrão.",
     "Nada aqui é pago: provedores que exigem cartão, créditos ou assinatura não entram neste arquivo.",
     "Modelos gratuitos em nuvem mudam com frequência ('por tempo limitado'). Confira a fonte e atualize 'consultado_em'.",
-    "No modo nuvem, o código do projeto e os pedidos são enviados ao provedor. Veja 'privacidade' de cada modelo."
+    "No modo nuvem, o código do projeto e os pedidos são enviados ao provedor. Veja 'privacidade' de cada modelo.",
+    "Modelo automático: usa só modelos 'sem-treino' presentes hoje em 'opencode models'; primeiro os validados no fluxo neste computador, depois a ORDEM DESTA LISTA. Modelos novos que não estão aqui nunca são escolhidos automaticamente."
   ],
   "provedores": [
     {
@@ -16,21 +17,93 @@
       "variavel_chave": null,
       "custo": "Gratuito sem conta. Sem conta nem OPENCODE_API_KEY, o OpenCode só habilita os modelos sem preço (packages/core/src/plugin/provider/opencode.ts, v2.2.6).",
       "limites": "Não publicados. Os modelos são gratuitos 'por tempo limitado' e podem sair da lista sem aviso.",
-      "regioes": "Alguns modelos não estão disponíveis em certos países; o Brasil não aparece nas listas de exclusão consultadas.",
+      "regioes": "Inkling 2 Small, Crouton Alpha e Beam têm listas de países excluídos; o Brasil não aparece nelas (consulta de 2026-11-08).",
       "prefixo_modelo": "opencode/",
-      "fontes": ["https://opencode.ai/docs/console/models", "https://opencode.ai/docs/models#free-models"],
-      "consultado_em": "2026-11-07",
+      "fontes": [
+        "https://opencode.ai/docs/console/models (fonte: github.com/anomalyco/opencode, services/site/src/docs/content/console/models.mdx, versão de 2026-11-08)",
+        "https://opencode.ai/docs/models#free-models"
+      ],
+      "consultado_em": "2026-11-08",
       "modelos": [
-        { "id": "deepseek-v4.1-flash-free", "nome": "DeepSeek V4.1 Flash Free", "privacidade": "sem-treino", "nota_privacidade": "Retenção zero; não usa os dados para treino." },
-        { "id": "glm-5.3-flash-free", "nome": "GLM-5.3-Flash Free", "privacidade": "sem-treino", "nota_privacidade": "Retenção zero; não usa os dados para treino." },
-        { "id": "beam-free", "nome": "Beam Free", "privacidade": "sem-treino", "nota_privacidade": "Não usa para treino; guarda os dados por 30 dias por segurança." },
-        { "id": "crouton-alpha-free", "nome": "Crouton Alpha Free", "privacidade": "sem-treino", "nota_privacidade": "Guarda por 30 dias; não usa para treino. Modelo 'stealth' (origem não divulgada)." },
-        { "id": "big-pickle", "nome": "Big Pickle", "privacidade": "pode-treinar", "nota_privacidade": "Durante o período gratuito, os dados podem ser usados para melhorar o modelo." },
-        { "id": "flint-40b-free", "nome": "Flint 40B Free", "privacidade": "pode-treinar", "nota_privacidade": "Pode usar os dados para melhorar o modelo; guarda por 30 dias." },
-        { "id": "mimo-v2.6-flash-free", "nome": "MiMo-V2.6-Flash Free", "privacidade": "pode-treinar", "nota_privacidade": "Pode usar os dados para melhorar o modelo." },
-        { "id": "pulse-alpha-free", "nome": "Pulse Alpha Free", "privacidade": "pode-treinar", "nota_privacidade": "Pode guardar e usar os dados para melhorar o modelo." },
-        { "id": "nemotron-3.5-lightning-free", "nome": "Nemotron 3.5 Lightning Free", "privacidade": "registrado", "nota_privacidade": "Termos de teste da NVIDIA: uso registrado; não envie dados pessoais ou confidenciais." },
-        { "id": "nemotron-3-ultra-free", "nome": "Nemotron 3 Ultra Free", "privacidade": "registrado", "nota_privacidade": "Termos de teste da NVIDIA: uso registrado; não envie dados pessoais ou confidenciais." }
+        {
+          "id": "deepseek-v4.1-flash-free",
+          "nome": "DeepSeek V4.1 Flash Free",
+          "privacidade": "sem-treino",
+          "nota_privacidade": "Retenção zero; não usa os dados para treino. Validado no fluxo em 2026-11-07 (Windows 11)."
+        },
+        {
+          "id": "glm-5.3-flash-free",
+          "nome": "GLM-5.3-Flash Free",
+          "privacidade": "sem-treino",
+          "nota_privacidade": "Retenção zero; não usa os dados para treino."
+        },
+        {
+          "id": "beam-free",
+          "nome": "Beam Free",
+          "privacidade": "sem-treino",
+          "nota_privacidade": "Não usa para treino; guarda os dados por 30 dias por segurança."
+        },
+        {
+          "id": "crouton-alpha-free",
+          "nome": "Crouton Alpha Free",
+          "privacidade": "sem-treino",
+          "nota_privacidade": "Guarda por 30 dias; não usa para treino. Modelo 'stealth' (origem não divulgada)."
+        },
+        {
+          "id": "big-pickle",
+          "nome": "Big Pickle",
+          "privacidade": "pode-treinar",
+          "nota_privacidade": "Modelo 'stealth'. Durante o período gratuito, os dados podem ser usados para melhorar o modelo."
+        },
+        {
+          "id": "iceman-free",
+          "nome": "Iceman Free",
+          "privacidade": "pode-treinar",
+          "nota_privacidade": "Modelo 'stealth'. Durante o período gratuito, os dados são guardados e usados para melhorar o modelo."
+        },
+        {
+          "id": "inkling-2-small-free",
+          "nome": "Inkling 2 Small Free",
+          "privacidade": "pode-treinar",
+          "nota_privacidade": "Os dados são guardados e podem ser usados para treino e para monitorar o modelo (termos do plano gratuito de pesquisa da Thinking Machines). Indisponível na União Europeia e em alguns países."
+        },
+        {
+          "id": "flint-40b-free",
+          "nome": "Flint 40B Free",
+          "privacidade": "pode-treinar",
+          "nota_privacidade": "Pode usar os dados para melhorar o modelo; guarda por 30 dias."
+        },
+        {
+          "id": "mimo-v2.6-flash-free",
+          "nome": "MiMo-V2.6-Flash Free",
+          "privacidade": "pode-treinar",
+          "nota_privacidade": "Pode usar os dados para melhorar o modelo."
+        },
+        {
+          "id": "nemotron-3.5-lightning-free",
+          "nome": "Nemotron 3.5 Lightning Free",
+          "privacidade": "registrado",
+          "nota_privacidade": "Termos de teste da NVIDIA: só para teste; não envie dados pessoais ou confidenciais. O uso é registrado para segurança e para melhorar produtos da NVIDIA (sem vínculo com sua identidade)."
+        },
+        {
+          "id": "nemotron-3.5-super-vl-free",
+          "nome": "Nemotron 3.5 Super VL Free",
+          "privacidade": "registrado",
+          "nota_privacidade": "Termos de teste da NVIDIA: só para teste; não envie dados pessoais ou confidenciais. O uso é registrado para segurança e para melhorar produtos da NVIDIA (sem vínculo com sua identidade)."
+        },
+        {
+          "id": "nemotron-3-ultra-free",
+          "nome": "Nemotron 3 Ultra Free",
+          "privacidade": "registrado",
+          "nota_privacidade": "Termos de teste da NVIDIA: só para teste; não envie dados pessoais ou confidenciais. O uso é registrado para segurança e para melhorar produtos da NVIDIA (sem vínculo com sua identidade). Constava na documentação em 2026-11-08, mas não apareceu em /models num Windows 11 no mesmo dia."
+        }
+      ],
+      "removidos": [
+        {
+          "id": "pulse-alpha-free",
+          "data": "2026-11-06",
+          "fonte": "seção 'Deprecated models' da mesma página"
+        }
       ]
     },
     {
@@ -43,11 +116,21 @@
       "limites": "20 pedidos por minuto e 50 por dia sem créditos comprados. Um agente de programação faz vários pedidos por tarefa, então o limite diário acaba rápido.",
       "regioes": null,
       "prefixo_modelo": "openrouter/",
-      "fontes": ["https://openrouter.ai/docs/limits", "https://openrouter.ai/docs/guides/routing/model-variants/free", "https://opencode.ai/docs/providers#gateways"],
+      "fontes": [
+        "https://openrouter.ai/docs/limits",
+        "https://openrouter.ai/docs/guides/routing/model-variants/free",
+        "https://opencode.ai/docs/providers#gateways"
+      ],
       "consultado_em": "2026-11-07",
       "modelos": [
-        { "id": "openrouter/free", "nome": "Roteador gratuito do OpenRouter (escolhe só entre modelos :free)", "privacidade": "desconhecida", "nota_privacidade": "Depende do provedor escolhido pelo roteador; a documentação consultada não informa. Pendente." }
+        {
+          "id": "openrouter/free",
+          "nome": "Roteador gratuito do OpenRouter (escolhe só entre modelos :free)",
+          "privacidade": "desconhecida",
+          "nota_privacidade": "Depende do provedor escolhido pelo roteador; a documentação consultada não informa. Pendente."
+        }
       ]
     }
-  ]
+  ],
+  "criterio_ordem": "Não há avaliação oficial diária dos modelos gratuitos. Entre os 'sem-treino', a ordem é a avaliação do mantenedor: 1) validado no roteiro de 6 itens deste repositório; 2) retenção zero antes de retenção de 30 dias; 3) origem divulgada antes de modelo 'stealth'. Revise a ordem ao validar um modelo novo."
 }

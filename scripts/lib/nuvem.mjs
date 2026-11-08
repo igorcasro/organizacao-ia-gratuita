@@ -79,3 +79,52 @@ export function missingKeys(cat, providers, env = process.env) {
     .filter((p) => p?.precisa_chave && !env[p.variavel_chave])
     .map((p) => ({ provedor: p.id, variavel: p.variavel_chave }));
 }
+
+// ---- Modelo automático ("o melhor do dia que não treina com seus dados") ----
+// Não existe uma avaliação oficial diária dos modelos gratuitos. O "melhor" é definido assim:
+//   1) só modelos que aparecem AGORA em 'opencode models' (a lista muda sem aviso);
+//   2) só modelos do catálogo com privacidade "sem-treino" (modelos novos, sem classificação, nunca entram);
+//   3) primeiro os já validados no fluxo de programação neste computador ('validar-fluxo');
+//   4) depois, a ordem do catálogo, que é a avaliação do mantenedor (ver 'criterio_ordem' no catálogo).
+export const AUTO = "auto";
+
+// Extrai "provedor/modelo" das linhas de 'opencode models'.
+export function parseModelList(stdout) {
+  return `${stdout || ""}`
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => /^[\w.-]+\/\S+/.test(l))
+    .map((l) => l.split(/\s+/)[0]);
+}
+
+export function findModel(cat, ref) {
+  const [pid, ...rest] = `${ref}`.split("/");
+  const id = rest.join("/");
+  const p = provider(cat, pid);
+  // No OpenRouter o id do catálogo já inclui o prefixo "openrouter/".
+  const m = p?.modelos.find((x) => x.id === id || x.id === ref);
+  return m ? { ...m, provedor: pid, ref } : null;
+}
+
+// Candidatos ao modelo automático, do melhor para o pior.
+export function autoCandidates(cat, providers, live = null, validados = []) {
+  const ordem = [];
+  for (const pid of providers) {
+    const p = provider(cat, pid);
+    for (const m of p?.modelos || []) if (m.privacidade === "sem-treino") ordem.push(modelRef(pid, m.id));
+  }
+  const presentes = live ? ordem.filter((r) => live.includes(r)) : ordem;
+  return [...presentes.filter((r) => validados.includes(r)), ...presentes.filter((r) => !validados.includes(r))];
+}
+
+// Modelos que o OpenCode oferece hoje e que o catálogo ainda não classifica.
+export function unclassified(cat, live, providers) {
+  return (live || []).filter((r) => providers.some((p) => r.startsWith(`${p}/`)) && !findModel(cat, r));
+}
+
+export const ETIQUETA = {
+  "sem-treino": "não treina com seus dados",
+  "pode-treinar": "PODE TREINAR com seus dados",
+  registrado: "uso registrado; nada confidencial",
+  desconhecida: "privacidade não informada",
+};

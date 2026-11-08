@@ -116,7 +116,7 @@ O pacote `nodejs` do Ubuntu 24.04 é da série 18, e os scripts deste repositór
   2. "Liberar opencode?": **Enter** (sim). São os modelos gratuitos do OpenCode, sem conta e sem chave.
   3. "Liberar openrouter?": **n**, a menos que você já tenha criado a conta e definido a chave (ver [nuvem-gratuita.md](nuvem-gratuita.md)).
   4. Leia os avisos de privacidade e digite `concordo`.
-  5. Modelo padrão: **Enter** para o sugerido, que não treina com os seus dados.
+  5. Modelo padrão: **Enter** para **Automático** (a primeira opção): a cada início, o script usa o melhor modelo disponível no dia que **não treina** com os seus dados (ver [nuvem-gratuita.md](nuvem-gratuita.md#modelo-padrão-automático-recomendado)).
 - **Resultado esperado:** `Modo 'nuvem' salvo. Provedores em nuvem liberados: opencode.`
 - **Verificação:** `node scripts/ia-local.mjs status` mostra `Modo: nuvem`.
 - **Falhas comuns:** "Confirmação não recebida" → nada foi salvo; rode de novo e digite exatamente `concordo`.

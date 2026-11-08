@@ -24,6 +24,9 @@ Todas consultadas em **2026-11-07**. Quando a fonte foi o repositório oficial, 
 | Serviço compartilhado em segundo plano | `cli/index.mdx` (*Background service*), `cli/commands.mdx` (`service`, `reload`); `packages/desktop/src/main/service/background-service.ts` e `desktop-cli.ts` |
 | Pasta global de configuração (inclusive no Windows; `XDG_CONFIG_HOME` e `OPENCODE_CONFIG_DIR`) | `packages/util/src/global-roots.ts`, `packages/util/src/global.ts` |
 | `opencode reload` (recarrega a configuração sem reiniciar o servidor) | `cli/commands.mdx` (*reload*) |
+| Modelos gratuitos, privacidade e descontinuados (2026-11-08) | `console/models.mdx` no ramo principal (commit de 2026-11-08), seções *Free models*, *Deprecated models* e *Privacy* |
+| Comparação de padrões de permissão (maiúsculas ignoradas no Windows) | `packages/core/src/util/wildcard.ts` |
+| Modelo padrão (`model`) na configuração | `config.mdx` (*Schema*), `models.mdx` (*Defaults*) |
 | Ordem de carga das configurações e precedência das políticas | `packages/core/src/config.ts`, `packages/core/src/config/plugin/policy.ts`; `policies.mdx` (*Precedence*) |
 | Desktop lê só `opencode.json(c)` | `build/plugins/gui/index.mdx` |
 | Documentação do V1 (para comparação; não usar nos manuais) | `packages/web/src/content/docs/index.mdx` |

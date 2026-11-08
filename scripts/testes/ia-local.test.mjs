@@ -386,7 +386,7 @@ test("CLI: modo nuvem sem Ollama — seleção, verificação e início", { skip
   const prefs = JSON.parse(fs.readFileSync(path.join(home, "preferencias.json"), "utf8"));
   assert.equal(prefs.modo, "nuvem");
   assert.deepEqual(prefs.nuvem.provedores, ["opencode"]);
-  assert.equal(prefs.nuvem.modelo, "opencode/deepseek-v4.1-flash-free", "sugere um modelo que não treina com os dados");
+  assert.equal(prefs.nuvem.modelo, "auto", "sugere o modelo automático (só modelos que não treinam)");
   assert.equal(prefs.nuvem.consentimento.versao, 1);
 
   const ver = await runCli(["verificar"], { env, input: "s\n" });
@@ -403,7 +403,9 @@ test("CLI: modo nuvem sem Ollama — seleção, verificação e início", { skip
   assert.equal(launch.OPENCODE_API_KEY, null, "chave paga do OpenCode removida do ambiente");
   assert.equal(launch.OPENCODE_DISABLE_FREE_MODELS, null, "modelos gratuitos liberados no modo nuvem");
   const cfg = JSON.parse(fs.readFileSync(launch.OPENCODE_CONFIG, "utf8"));
-  assert.equal(cfg.model, "opencode/deepseek-v4.1-flash-free");
+  assert.equal(cfg.model, "opencode/deepseek-v4.1-flash-free", "automático: primeiro 'sem-treino' do catálogo presente hoje (Big Pickle, listado antes, pode treinar)");
+  assert.match(ini.out, /Modelo automático de hoje: opencode\/deepseek-v4\.1-flash-free/);
+  assert.match(ini.out, /sem classificação de privacidade.*opencode\/novo-teste-free/);
   assert.deepEqual(cfg.policies.map((p) => `${p.resource}:${p.effect}`), ["*:deny", "opencode:allow", "*:deny"]);
   assert.ok(!bins.calls().some((c) => c.bin === "ollama" && c.args[0] !== "--version"), "não chama o Ollama no modo nuvem");
 });
@@ -531,7 +533,9 @@ test("exemplo de configuração global: mesmas permissões do script e nenhuma r
 test("config-global: grava com confirmação, não toca em arquivo da pessoa e remove só o próprio", async () => {
   const cg = await import("../lib/configglobal.mjs");
   const xdg = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-xdg-"));
-  const env = { IA_LOCAL_HOME: tmpHome(), XDG_CONFIG_HOME: xdg, OPENCODE_CONFIG_DIR: "" };
+  // PATH vazio: nenhum OpenCode real é chamado (sem rede); o modelo do dia fica "nenhum".
+  const semBin = fs.mkdtempSync(path.join(os.tmpdir(), "ia-local-sembin-"));
+  const env = { IA_LOCAL_HOME: tmpHome(), XDG_CONFIG_HOME: xdg, OPENCODE_CONFIG_DIR: "", PATH: semBin, Path: semBin };
   const pasta = path.join(xdg, "opencode");
   const alvo = path.join(pasta, "opencode.jsonc");
 
@@ -543,6 +547,14 @@ test("config-global: grava com confirmação, não toca em arquivo da pessoa e r
   assert.deepEqual(cfg.policies, ex.policies);
   assert.ok(!cg.texto().includes("provider.use"));
   assert.ok(!cfg.instructions[0].includes("\\"), "barras normais no caminho");
+
+  // O modelo padrão gravado é lido de volta.
+  fs.mkdirSync(pasta, { recursive: true });
+  fs.writeFileSync(alvo, cg.texto("opencode/deepseek-v4.1-flash-free"));
+  const lido = cg.estado({ XDG_CONFIG_HOME: xdg }).arquivos.find((a) => a.nome === "opencode.jsonc");
+  assert.ok(lido.nosso && lido.atualizado);
+  assert.equal(lido.modelo, "opencode/deepseek-v4.1-flash-free");
+  fs.rmSync(alvo);
 
   // Recusar a confirmação não grava nada.
   let r = await runCli(["config-global", "aplicar"], { env, input: "n\n" });
@@ -573,4 +585,33 @@ test("config-global: grava com confirmação, não toca em arquivo da pessoa e r
   r = await runCli(["config-global", "remover"], { env, input: "s\n" });
   assert.equal(fs.readFileSync(seu, "utf8"), conteudo);
   assert.ok(!fs.existsSync(alvo));
+});
+
+test("modelo automático: só 'sem-treino' presente hoje, validados primeiro, novos nunca entram", async () => {
+  const nuvemMod = await import("../lib/nuvem.mjs");
+  const cat = nuvemMod.load();
+  const live = ["opencode/big-pickle", "opencode/iceman-free", "opencode/glm-5.3-flash-free", "opencode/beam-free"];
+  assert.deepEqual(nuvemMod.autoCandidates(cat, ["opencode"], live), ["opencode/glm-5.3-flash-free", "opencode/beam-free"]);
+  assert.deepEqual(nuvemMod.autoCandidates(cat, ["opencode"], live, ["opencode/beam-free"])[0], "opencode/beam-free");
+  assert.deepEqual(nuvemMod.autoCandidates(cat, ["opencode"], ["opencode/big-pickle", "opencode/novo-x-free"]), []);
+  assert.deepEqual(nuvemMod.unclassified(cat, ["opencode/novo-x-free", "opencode/beam-free", "ollama/a:1"], ["opencode"]), ["opencode/novo-x-free"]);
+  assert.deepEqual(nuvemMod.parseModelList("opencode/a-free  Nome\n\nlixo\nollama/b:1\n"), ["opencode/a-free", "ollama/b:1"]);
+  for (const m of cat.provedores.flatMap((p) => p.modelos)) assert.ok(m.nota_privacidade, `${m.id}: nota de privacidade`);
+});
+
+test("comandos de rede pedem aprovação também com .exe, caminho completo e maiúsculas (Windows)", async () => {
+  const { securityPermissions } = await import("../lib/opencode.mjs");
+  const rede = securityPermissions().filter((r) => r.action === "shell" && r.effect === "ask").map((r) => r.resource);
+  // Mesmo algoritmo de packages/core/src/util/wildcard.ts (v2.2.6), com a flag "i" usada no Windows.
+  const match = (input, pattern) => {
+    let e = pattern.replaceAll("\\", "/").replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".");
+    if (e.endsWith(" .*")) e = e.slice(0, -3) + "( .*)?";
+    return new RegExp("^" + e + "$", "si").test(input.replaceAll("\\", "/"));
+  };
+  for (const c of ["curl.exe -sS -i --max-time 20 https://example.com", "curl https://x", "C:\\Windows\\System32\\curl.exe https://x", "CURL.EXE x", "invoke-webrequest https://x", "git push origin main", "git.exe push", "/usr/bin/wget x"]) {
+    assert.ok(rede.some((p) => match(c, p)), `deveria pedir aprovação: ${c}`);
+  }
+  for (const c of ["npm test", "git status", "Get-Content curl.txt", "ssh-keygen -t ed25519"]) {
+    assert.ok(!rede.some((p) => match(c, p)), `não deveria pedir: ${c}`);
+  }
 });

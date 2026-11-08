@@ -34,6 +34,7 @@ Por isso o repositório traz [`configs/opencode.global.jsonc`](../configs/openco
 | Leitura e edição de arquivos de segredos bloqueadas | Sim |
 | Instruções de segurança entregues ao modelo | Sim |
 | **Só os provedores do modo escolhido** | **Não** (ver abaixo) |
+| Modelo padrão que não treina com os dados | Sim: `config-global aplicar` grava o melhor do dia (`model`). A lista muda; rode de novo quando o `iniciar` avisar. Sem isso, o padrão observado foi o Big Pickle, que pode treinar |
 | Modelos pagos escondidos (`OPENCODE_API_KEY` removida) | Parcial: sem conta conectada e sem a variável definida, o OpenCode já mostra só os gratuitos. Não dá para *remover* uma variável pelo serviço (`opencode service set env` só acrescenta) |
 | Sem consulta de atualização; versão fixa 2.2.6 | **Não**: o Desktop traz o próprio OpenCode embutido e se atualiza sozinho; o link de download é sempre o da versão mais recente |
 | Skills de `~/.claude` fora do prompt | **Não** confirmado por configuração; pendente |

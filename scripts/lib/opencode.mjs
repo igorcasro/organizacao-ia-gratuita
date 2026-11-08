@@ -19,7 +19,26 @@ export const SECURITY_INSTRUCTIONS = path.join(REPO_DIR, "configs", "instrucoes-
 // Permissões de proteção (docs/seguranca.md). A última regra que corresponde vence e estas entram depois
 // dos padrões do OpenCode, então prevalecem sobre eles. Não são aplicadas a configurações de projeto mais fortes.
 const SEGREDOS = ["*.env", "*.env.*", "*.pem", "*.key", "*.p12", "*.pfx", "*.kdbx", "*id_rsa*", "*id_ed25519*", "*/.ssh/*", "*/.aws/*", "*/.azure/*", "*/.gnupg/*", "*/.git-credentials", "*/.npmrc", "*/.pypirc", "*/.docker/config.json", "*/.kube/config"];
-const REDE = ["curl *", "wget *", "scp *", "sftp *", "ssh *", "rsync *", "nc *", "ncat *", "telnet *", "ftp *", "Invoke-WebRequest *", "Invoke-RestMethod *", "iwr *", "irm *", "Start-BitsTransfer *", "git push *", "git remote *", "npm publish *", "gh *"];
+// Comandos de rede que pedem aprovação. Cada um vale também com ".exe" e com caminho completo:
+// em 2026-11-08, no Windows, o modelo usou "curl.exe ..." e escapou de "curl *" (docs/validacao.md).
+// No Windows a comparação ignora maiúsculas (packages/core/src/util/wildcard.ts, v2.2.6).
+// É uma lista de melhor esforço: comandos indiretos (node -e, python -c, git -C <pasta> push) não são pegos.
+const PROGRAMAS_REDE = ["curl", "wget", "scp", "sftp", "ssh", "rsync", "nc", "ncat", "telnet", "ftp", "Invoke-WebRequest", "Invoke-RestMethod", "iwr", "irm", "Start-BitsTransfer", "git push", "git remote", "npm publish", "gh"];
+export function redePatterns(programas = PROGRAMAS_REDE) {
+  const out = [];
+  for (const p of programas) {
+    const [cmd, ...resto] = p.split(" ");
+    const sufixo = resto.length ? ` ${resto.join(" ")} *` : " *";
+    const cmdlet = cmd.includes("-"); // cmdlets do PowerShell não têm .exe nem caminho
+    const nomes = cmdlet ? [cmd] : [cmd, `${cmd}.exe`];
+    for (const n of nomes) {
+      out.push(`${n}${sufixo}`);
+      if (!cmdlet) out.push(`*/${n}${sufixo}`);
+    }
+  }
+  return out;
+}
+const REDE = redePatterns();
 
 export function securityPermissions() {
   return [

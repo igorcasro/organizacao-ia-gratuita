@@ -35,7 +35,7 @@ O script mostra estes avisos e pede que você digite `concordo` antes de salvar 
 
 Quando os avisos mudarem, o consentimento é pedido de novo (`VERSAO_CONSENTIMENTO` em `scripts/lib/nuvem.mjs`).
 
-## Opções incluídas (consultadas em 2026-11-07)
+## Opções incluídas (consultadas em 2026-11-08)
 
 O catálogo fica em [`catalogo/nuvem-gratuita.json`](../catalogo/nuvem-gratuita.json). Só entram opções **sem cartão, sem créditos e sem assinatura**.
 
@@ -45,19 +45,33 @@ O catálogo fica em [`catalogo/nuvem-gratuita.json`](../catalogo/nuvem-gratuita.
 - **Como funciona:** sem conta e sem `OPENCODE_API_KEY`, o OpenCode 2 habilita só os modelos sem preço do provedor `opencode`. Os pagos ficam desabilitados (confirmado no código-fonte da versão 2.2.6). Para garantir isso, o script **remove `OPENCODE_API_KEY`** do ambiente do OpenCode.
 - **Limites:** não publicados.
 
-| Modelo (`opencode/...`) | Privacidade, segundo a documentação do OpenCode |
+| Modelo (`opencode/...`) | Privacidade, segundo a documentação do OpenCode (2026-11-08) |
 |---|---|
-| `deepseek-v4.1-flash-free` | Retenção zero; não treina com os dados |
+| `deepseek-v4.1-flash-free` | Retenção zero; não treina com os dados. **Validado no fluxo** (Windows 11, 2026-11-07) |
 | `glm-5.3-flash-free` | Retenção zero; não treina com os dados |
 | `beam-free` | Não treina; guarda por 30 dias por segurança |
 | `crouton-alpha-free` | Não treina; guarda por 30 dias (origem não divulgada) |
-| `big-pickle` | **Pode usar os dados** para melhorar o modelo |
+| `big-pickle` | **Pode usar os dados** para melhorar o modelo (origem não divulgada) |
+| `iceman-free` | **Guarda e usa os dados** para melhorar o modelo (origem não divulgada) |
+| `inkling-2-small-free` | **Guarda os dados e pode usá-los para treino** (Thinking Machines) |
 | `flint-40b-free` | **Pode usar os dados**; guarda por 30 dias |
 | `mimo-v2.6-flash-free` | **Pode usar os dados** |
-| `pulse-alpha-free` | **Pode guardar e usar os dados** |
-| `nemotron-3.5-lightning-free`, `nemotron-3-ultra-free` | Termos de teste da NVIDIA: uso registrado; **não envie dados pessoais ou confidenciais** |
+| `nemotron-3.5-lightning-free`, `nemotron-3.5-super-vl-free`, `nemotron-3-ultra-free` | Termos de teste da NVIDIA: uso registrado; **não envie dados pessoais ou confidenciais** |
 
-No modo nuvem, o script sugere como padrão o primeiro modelo que **não treina** com os dados. Você também pode deixar sem padrão e escolher dentro do OpenCode com `/models`.
+Saiu da lista: `pulse-alpha-free` (descontinuado em 2026-11-06).
+
+### Modelo padrão automático (recomendado)
+
+Não existe uma avaliação oficial, atualizada a cada dia, dos modelos gratuitos. Por isso o **modelo automático** funciona assim, a cada `iniciar` e `verificar`:
+
+1. Consulta a lista **de hoje** com `opencode models` (não envia pedido a nenhum modelo).
+2. Considera só os modelos marcados como **não treina** no catálogo. Modelos novos, ainda sem classificação, **nunca** são escolhidos automaticamente; o script só avisa que eles existem.
+3. Prefere os que você já **validou no fluxo** neste computador (`validar-fluxo`).
+4. Depois, segue a ordem do catálogo, que é a avaliação do mantenedor (campo `criterio_ordem`): validado no roteiro → retenção zero → origem divulgada.
+
+Se o modelo que você fixou sumir da lista, o script avisa e usa o automático (que só escolhe modelos que não treinam). Nunca troca para o modo local.
+
+Para usar: rode `modo` e escolha a opção **Automático** (a primeira). Sem o script (Desktop, interface web ou `opencode` puro), o modelo padrão vem do `config-global aplicar`, que grava o melhor do dia; rode-o de novo quando o `iniciar` avisar que mudou. Sem isso, o OpenCode abriu com o **Big Pickle**, que pode treinar com os dados (observado em 2026-11-08).
 
 **Ainda não sabemos quais desses modelos funcionam bem como agente de programação** (ferramentas, edição de arquivos). Isso depende de validação (`validar-fluxo`).
 

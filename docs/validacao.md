@@ -62,6 +62,7 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Trocar para `plan`: **Shift+Tab** (o manual dizia Tab numa orientação dada na conversa; os documentos já diziam Shift+Tab) | Testado |
 | Nova linha com Shift+Enter **não funciona** no Windows Terminal; documentada a alternativa **Ctrl+J** (doc `cli/tui.mdx`) | Shift+Enter testado; Ctrl+J pendente |
 | Acentos trocados na saída de `Get-Content` executado pelo agente (provável Windows PowerShell 5.1); ver problemas.md | Observado; causa pendente |
+| Lista de modelos gratuitos mudou em 1 dia (2026-11-07 → 08): entraram Iceman, Inkling 2 Small e Nemotron 3.5 Super VL; saiu Pulse Alpha. Catálogo atualizado; script passa a avisar sobre modelos novos sem classificação e a escolher o modelo automaticamente | Corrigido; reteste pendente |
 | `verificar` após a correção do `PWD`: pedido de teste respondido `OK`; verificado tecnicamente | Testado |
 | `validar-fluxo` no modo nuvem com `deepseek-v4.1-flash-free`: inicialização, leitura, explicação, alteração, teste e reversão — **6 de 6** | Testado (avaliação da pessoa) |
 | Comando `npm test` executado pelo agente **sem pedir aprovação**: está de acordo com as permissões geradas (só comandos de rede pedem). O roteiro dizia "após sua permissão"; texto corrigido | Testado |
@@ -125,10 +126,14 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Políticas globais prevalecem sobre as de projeto e sobre as de `OPENCODE_CONFIG`; por isso `configs/opencode.global.jsonc` não tem regra de provedor | Confirmado (código `packages/core/src/config.ts`, `config/plugin/policy.ts`) |
 | `configs/opencode.global.jsonc` tem as mesmas permissões do script e nenhuma regra de provedor | Testado (teste automatizado) |
 | Desktop traz o próprio OpenCode embutido e se atualiza: a versão não fica fixa em 2.2.6 | Confirmado (código `packages/desktop/src/main/service/desktop-cli.ts`); versão real pendente |
-| Efeito real no Desktop e na web: permissões pedidas, segredos bloqueados, busca na web bloqueada, instruções carregadas, só modelos gratuitos sem conta | **Pendente** (roteiro abaixo) |
+| `opencode` **sem o script**, com a configuração global (Windows 11, 2026-11-08, após `opencode service restart`): `opencode debug paths config` = pasta do `config-global`; instruções de segurança carregadas; `.env` recusado (pelo modelo, citando as regras; bloqueio pela permissão ainda não isolado); pedido de busca na web virou **abrir URL** (`WebFetch`), que **pediu aprovação** e foi rejeitado; `/models` só com gratuitos | Testado |
+| **Falha encontrada:** o modelo executou `curl.exe -sS -i ... https://example.com` **sem pedir aprovação** (a regra era `curl *`). Regras de rede ampliadas para `.exe`, caminho completo e maiúsculas, com teste que reproduz o comparador do OpenCode | Corrigido; reteste no Windows **pendente** |
+| Sem o script, o modelo padrão foi o **Big Pickle** (pode treinar com os dados). `config-global aplicar` passa a gravar o melhor modelo do dia que não treina | Corrigido; reteste pendente |
+| Depois de `config-global aplicar`, é preciso `opencode reload` ou `opencode service restart`: o serviço continuou rodando depois de sair com Ctrl+D | Testado |
+| Efeito real no Desktop e na web | **Pendente** (roteiro abaixo) |
 | `instructions` com caminho absoluto do Windows em barras normais (`C:/...`) | **Pendente** |
 | Comando `config-global` (mostrar, aplicar com confirmação, não repetir, remover renomeando, recusar arquivo da pessoa e avisar sobre regra de provedor) | Testado com teste automatizado (Linux, pasta temporária via `XDG_CONFIG_HOME`); no Windows real, **pendente** |
-| A pasta calculada pelo `config-global` é a mesma de `opencode debug paths config` | **Pendente** (conferir no Windows e no Ubuntu) |
+| A pasta calculada pelo `config-global` é a mesma de `opencode debug paths config` | Testado no Windows 11 (2026-11-08); Ubuntu pendente |
 
 **Roteiro (num computador sem dados importantes no OpenCode):**
 1. Rode `node scripts/ia-local.mjs config-global` e compare a pasta mostrada com `opencode debug paths config`; depois `config-global aplicar` e `opencode reload` ([interface-grafica.md](interface-grafica.md#como-aplicar-opcional)).

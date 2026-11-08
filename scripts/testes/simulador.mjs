@@ -77,7 +77,7 @@ const args = process.argv.slice(2);
 fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify({ bin: "opencode", args, OPENCODE_CONFIG: process.env.OPENCODE_CONFIG || null, OPENCODE_API_KEY: process.env.OPENCODE_API_KEY || null, OPENCODE_DISABLE_FREE_MODELS: process.env.OPENCODE_DISABLE_FREE_MODELS || null, OPENCODE_DISABLE_AUTOUPDATE: process.env.OPENCODE_DISABLE_AUTOUPDATE || null, OPENCODE_DISABLE_CLAUDE_CODE: process.env.OPENCODE_DISABLE_CLAUDE_CODE || null, OPENCODE_DISABLE_MODELS_FETCH: process.env.OPENCODE_DISABLE_MODELS_FETCH || null, OPENCODE_DISABLE_PROJECT_CONFIG: process.env.OPENCODE_DISABLE_PROJECT_CONFIG || null, cwd: process.cwd() }) + "\\n");
 if (args[0] === "--version") { console.log(${JSON.stringify(opencodeVersion)}); process.exit(0); }
 if (args[0] === "models") {
-  const all = ["opencode/deepseek-v4.1-flash-free", "opencode/big-pickle", "anthropic/claude-sonnet-5-5", "ollama/qwen3.5:9b"];
+  const all = ["opencode/big-pickle", "opencode/novo-teste-free", "opencode/glm-5.3-flash-free", "opencode/deepseek-v4.1-flash-free", "anthropic/claude-sonnet-5-5", "ollama/qwen3.5:9b"];
   let allow = null;
   try {
     const cfg = JSON.parse(fs.readFileSync(process.env.OPENCODE_CONFIG, "utf8"));

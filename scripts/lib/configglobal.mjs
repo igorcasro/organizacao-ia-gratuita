@@ -19,9 +19,12 @@ export function dir(env = process.env) {
   return path.join(base, "opencode");
 }
 
-export function config() {
+// "modelo": modelo padrão para o Desktop e o "opencode" sem o script (o melhor do dia que não treina).
+// O "iniciar" sempre passa o próprio modelo, então este valor não interfere no script.
+export function config(modelo = null) {
   return {
     $schema: "https://opencode.ai/config.json",
+    ...(modelo ? { model: modelo } : {}),
     policies: [{ action: "websearch.use", resource: "*", effect: "deny" }],
     permissions: securityPermissions(),
     // Barras normais: aceitas pelo Node.js no Windows e sem escapes no JSON.
@@ -29,13 +32,13 @@ export function config() {
   };
 }
 
-export function texto() {
+export function texto(modelo = null) {
   return [
     `// ${MARCA}`,
     "// Proteções independentes do modo: busca na web bloqueada, aprovações, segredos bloqueados e",
     "// instruções de segurança. Sem regra de provedor, de propósito. Para remover:",
     "//   node scripts/ia-local.mjs config-global remover",
-    JSON.stringify(config(), null, 2),
+    JSON.stringify(config(modelo), null, 2),
     "",
   ].join("\n");
 }
@@ -46,12 +49,17 @@ export function estado(env = process.env) {
     const file = path.join(pasta, nome);
     if (!fs.existsSync(file)) return { nome, file, existe: false };
     const conteudo = fs.readFileSync(file, "utf8");
+    let modelo = null;
+    try {
+      modelo = JSON.parse(conteudo.split(/\r?\n/).filter((l) => !/^\s*\/\//.test(l)).join("\n")).model || null;
+    } catch {}
     return {
       nome,
       file,
       existe: true,
       nosso: conteudo.includes(MARCA),
-      atualizado: conteudo === texto(),
+      modelo,
+      atualizado: conteudo === texto(modelo),
       regraProvedor: /provider\.use/.test(conteudo),
     };
   });
@@ -67,14 +75,14 @@ function mostrar(st) {
   console.log("(confira com: opencode debug paths config)");
   for (const a of st.arquivos) {
     if (!a.existe) console.log(`- ${a.nome}: não existe`);
-    else if (a.nosso) console.log(`- ${a.nome}: gerado por este repositório${a.atualizado ? "" : " (DESATUALIZADO: rode 'config-global aplicar')"}`);
+    else if (a.nosso) console.log(`- ${a.nome}: gerado por este repositório; modelo padrão: ${a.modelo || "nenhum"}${a.atualizado ? "" : " (regras DESATUALIZADAS: rode 'config-global aplicar')"}`);
     else console.log(`- ${a.nome}: arquivo seu (não será alterado)${a.regraProvedor ? " — ATENÇÃO: tem regra de provedor (provider.use), que vence as do script e pode bloquear modos" : ""}`);
   }
 }
 
 const RECARREGAR = "Para valer agora: 'opencode reload' (ou feche e abra o OpenCode Desktop).";
 
-async function aplicar(st) {
+async function aplicar(st, modeloDoDia) {
   const alheio = st.arquivos.find((a) => a.existe && !a.nosso);
   if (alheio) {
     throw new UserError(
@@ -83,7 +91,9 @@ async function aplicar(st) {
     );
   }
   const nosso = st.arquivos.find((a) => a.existe && a.nosso);
-  if (nosso?.atualizado) {
+  const { modelo, motivo } = modeloDoDia();
+  console.log(`\nModelo padrão: ${modelo || "nenhum"} — ${motivo}`);
+  if (nosso?.atualizado && nosso.modelo === modelo) {
     console.log("A configuração global já está aplicada e atualizada. Nada a fazer.");
     return;
   }
@@ -94,6 +104,7 @@ async function aplicar(st) {
   console.log("- buscar URLs, acessar pastas fora do projeto e comandos de rede pedem aprovação;");
   console.log("- leitura e edição de arquivos de segredos (.env, chaves) bloqueadas;");
   console.log(`- instruções de segurança: ${SECURITY_INSTRUCTIONS}`);
+  if (modelo) console.log(`- modelo padrão: ${modelo} (não treina com seus dados). A lista muda: rode 'config-global aplicar' de novo para atualizar;`);
   console.log("NÃO limita provedores: no Desktop, a escolha entre nuvem e local fica com você em /models.");
   console.log("Se você mover ou apagar esta pasta do repositório, rode 'config-global aplicar' de novo (as instruções apontam para ela).");
   if (!(await confirm("Gravar a configuração global?", { defaultYes: false }))) {
@@ -107,7 +118,7 @@ async function aplicar(st) {
     console.log(`Cópia da versão anterior: ${copia}`);
     if (nosso.file !== destino) fs.rmSync(nosso.file);
   }
-  fs.writeFileSync(destino, texto());
+  fs.writeFileSync(destino, texto(modelo));
   console.log(`Gravado: ${destino}`);
   console.log(RECARREGAR);
 }
@@ -133,7 +144,23 @@ async function remover(st) {
   console.log(RECARREGAR);
 }
 
-export async function run(args = []) {
+// Melhor modelo do dia que não treina, consultando 'opencode models' só com o provedor gratuito do OpenCode.
+// Sem OpenCode ou sem internet, nenhum modelo é gravado (o OpenCode usa o padrão dele).
+async function modeloDoDiaPadrao() {
+  const nuvem = await import("./nuvem.mjs");
+  const opencode = await import("./opencode.mjs");
+  const prefs = (await import("./preferencias.mjs")).load();
+  const cat = nuvem.load();
+  const r = opencode.listModels(["opencode"]);
+  if (!r.ok) return { modelo: null, motivo: "não foi possível consultar a lista de hoje ('opencode models'); nenhum modelo padrão gravado. ATENÇÃO: o OpenCode pode então usar um modelo que treina com seus dados." };
+  const live = nuvem.parseModelList(r.stdout);
+  const validados = Object.entries(prefs.validacoes || {}).filter(([k, v]) => k.startsWith("nuvem:") && v?.fluxo?.ok).map(([k]) => k.slice(6));
+  const [melhor] = nuvem.autoCandidates(cat, ["opencode"], live, validados);
+  if (!melhor) return { modelo: null, motivo: "nenhum modelo que não treina está disponível hoje; escolha em /models com cuidado." };
+  return { modelo: melhor, motivo: "o melhor modelo disponível hoje que não treina com seus dados." };
+}
+
+export async function run(args = [], { modeloDoDia = null } = {}) {
   const sub = args[0] || "mostrar";
   title("Configuração global do OpenCode");
   const st = estado();
@@ -143,7 +170,10 @@ export async function run(args = []) {
     if (!nosso) console.log("\nPara aplicar: node scripts/ia-local.mjs config-global aplicar  (leia docs/interface-grafica.md)");
     return;
   }
-  if (sub === "aplicar") return aplicar(st);
+  if (sub === "aplicar") {
+    const md = modeloDoDia ? await modeloDoDia() : await modeloDoDiaPadrao();
+    return aplicar(st, () => md);
+  }
   if (sub === "remover") return remover(st);
   warn(`Opção desconhecida: ${sub}`);
   throw new UserError(`'config-global ${sub}' não existe.`, "Use: config-global [mostrar|aplicar|remover].");
