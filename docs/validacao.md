@@ -206,3 +206,4 @@ Use-o em cada sistema (Windows 11 e Ubuntu 24.04) e em perfis de hardware difere
 | Data | Sistema | CPU / RAM / GPU (VRAM) | Ollama | OpenCode | Modelo | Contexto | Medição (memória, % GPU) | Fluxo (6 itens) | Observações |
 |---|---|---|---|---|---|---|---|---|---|
 | 2026-11-07 | Windows 11 Pro 64 bits, Git Bash | não se aplica (modo nuvem) | não instalado | 2.2.6 | `opencode/deepseek-v4.1-flash-free` (nuvem) | definido pelo provedor | não se aplica | 6 de 6 ok | Ver observações abaixo |
+- 2026-11-09 — Revisor na configuração global: `node --test scripts/testes/ia-local.test.mjs` (28 passaram, 12 pulados). Uso do revisor em uma sessão real do OpenCode ainda pendente.

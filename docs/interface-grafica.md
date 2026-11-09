@@ -115,3 +115,14 @@ Efeito colateral bom: o comando `opencode` aberto direto, sem o script, também 
 1. **Recomendar o Desktop aos colegas:** sim, decidido em 2026-11-08 após a validação no Windows 11, para o **modo nuvem**, sempre com a configuração global aplicada e aberto pelo atalho **OpenCode (gratuito)**. O terminal (`iniciar`) continua sendo o caminho dos modos local e misto e o único que limita os provedores ao modo.
 3. **Atualização automática pelo atalho:** aprovada em 2026-11-08. O atalho atualiza sem perguntar só o arquivo com a marca do repositório (regras e modelo padrão que não treina); nunca cria o arquivo, nunca toca em arquivo da pessoa e não altera o código do OpenCode.
 2. **Configuração global por comando do script:** aprovado, para evitar erros de cópia manual. Implementado em `config-global`, com confirmação, sem tocar em arquivos da pessoa e sem regra de provedor (regra 5 do [CLAUDE.md](../CLAUDE.md) ajustada).
+## Subagente revisor
+
+O comando `node scripts/ia-local.mjs config-global aplicar` inclui o subagente
+`revisor` na configuração global gerenciada pelo repositório. Depois de
+atualizar o repositório e aplicar a configuração, abra uma nova sessão do
+OpenCode e peça ao Build: “Use o subagente revisor para revisar minhas mudanças”.
+
+O revisor herda o modelo da sessão e tem edição e comandos bloqueados. O Build
+pode executar os testes permitidos. Se você mantém um arquivo global próprio,
+o comando preserva esse arquivo. Nesse caso, você pode definir o revisor
+manualmente na pasta global de agentes.

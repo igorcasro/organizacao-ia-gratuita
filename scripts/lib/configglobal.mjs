@@ -27,6 +27,17 @@ export function config(modelo = null) {
     ...(modelo ? { model: modelo } : {}),
     policies: [{ action: "websearch.use", resource: "*", effect: "deny" }],
     permissions: securityPermissions(),
+    agents: {
+      revisor: {
+        description: "Revisa mudanças de código em busca de bugs, regressões e lacunas nos testes.",
+        mode: "subagent",
+        permissions: [
+          { action: "edit", resource: "*", effect: "deny" },
+          { action: "shell", resource: "*", effect: "deny" },
+        ],
+        system: "Revise as mudanças indicadas e leia o código relacionado. Priorize bugs, regressões e lacunas importantes nos testes. Para cada achado, indique gravidade, arquivo, linha e cenário em que ocorre. Se não houver achados, diga o que conseguiu verificar.",
+      },
+    },
     // Barras normais: aceitas pelo Node.js no Windows e sem escapes no JSON.
     instructions: [SECURITY_INSTRUCTIONS.split(path.sep).join("/")],
     // '/atualizar-ia' dentro do OpenCode (terminal, web ou Desktop) roda 'git pull' neste repositório.
@@ -118,6 +129,7 @@ async function aplicar(st, modeloDoDia) {
   console.log("- busca na web bloqueada;");
   console.log("- buscar URLs, acessar pastas fora do projeto e comandos de rede pedem aprovação;");
   console.log("- leitura e edição de arquivos de segredos (.env, chaves) bloqueadas;");
+  console.log("- subagente revisor disponível, com edição e comandos bloqueados;");
   console.log(`- instruções de segurança: ${SECURITY_INSTRUCTIONS}`);
   if (modelo) console.log(`- modelo padrão: ${modelo} (não treina com seus dados). A lista muda: rode 'config-global aplicar' de novo para atualizar;`);
   console.log("NÃO limita provedores: no Desktop, a escolha entre nuvem e local fica com você em /models.");

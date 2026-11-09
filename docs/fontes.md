@@ -97,3 +97,4 @@ Todas consultadas em **2026-11-07**. Quando a fonte foi o repositório oficial, 
 |---|---|
 | Versões do Node.js | https://github.com/nodejs/node (tags `v24.*`) ; https://nodejs.org |
 | nvm 0.41.0 (comando de instalação, `nvm install 24`) | https://github.com/nvm-sh/nvm (README na tag `v0.41.0`) |
+- 2026-11-09 — [Agentes do OpenCode 2](https://opencode.ai/docs/agents): configuração `agents`, permissões por agente e herança do modelo da sessão.
