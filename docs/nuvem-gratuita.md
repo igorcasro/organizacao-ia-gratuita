@@ -71,7 +71,9 @@ Não existe uma avaliação oficial, atualizada a cada dia, dos modelos gratuito
 
 Se o modelo que você fixou sumir da lista, o script avisa e usa o automático (que só escolhe modelos que não treinam). Nunca troca para o modo local.
 
-Para usar: rode `modo` e aperte Enter em **Automático** (a primeira opção, já marcada). Quem quiser **fixar** um modelo escolhe a segunda opção: a lista mostrada é a **de hoje** (`opencode models`), com a privacidade do catálogo; modelos novos aparecem como "privacidade NÃO classificada". Sem o script (Desktop, interface web ou `opencode` puro), o modelo padrão vem do `config-global aplicar`, que grava o melhor do dia; rode-o de novo quando o `iniciar` avisar que mudou. Sem isso, o OpenCode abriu com o **Big Pickle**, que pode treinar com os dados (observado em 2026-11-08).
+Para usar: rode `modo` e aperte Enter em **Automático** (a primeira opção, já marcada). Quem quiser **fixar** um modelo escolhe a segunda opção: a lista mostrada é a **de hoje** (`opencode models`), **em ordem de recomendação** (o 1º, marcado "RECOMENDADO HOJE", é o que o Automático usaria), com a privacidade de cada um.
+
+**"Recomendado" não é "o mais rápido" ou "o mais inteligente".** Não existe um ranking oficial e diário de desempenho desses modelos gratuitos: o OpenCode não publica notas por modelo, e a lista do próprio OpenCode não está em ordem de qualidade. A ordem deste repositório segue privacidade e validação. Se você perceber que um modelo programa melhor, reordene o catálogo (campo `criterio_ordem`) e valide com `validar-fluxo`: modelos validados no seu computador passam à frente no Automático. Sem o script (Desktop, interface web ou `opencode` puro), o modelo padrão vem do `config-global aplicar`, que grava o melhor do dia; rode-o de novo quando o `iniciar` avisar que mudou. Sem isso, o OpenCode abriu com o **Big Pickle**, que pode treinar com os dados (observado em 2026-11-08).
 
 **Ainda não sabemos quais desses modelos funcionam bem como agente de programação** (ferramentas, edição de arquivos). Isso depende de validação (`validar-fluxo`).
 

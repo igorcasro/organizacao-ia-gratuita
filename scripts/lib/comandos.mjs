@@ -559,16 +559,23 @@ export async function cmdModo() {
       const r = opencode.listModels(escolhidos);
       const live = r.ok ? nuvem.parseModelList(r.stdout).filter((ref) => escolhidos.some((p) => ref.startsWith(`${p}/`))) : null;
       if (!live) warn("Não foi possível consultar a lista de hoje ('opencode models'); mostrando o catálogo do repositório.");
-      const refs = live || escolhidos.flatMap((pid) => nuvem.provider(cat, pid).modelos.map((m) => nuvem.modelRef(pid, m.id)));
-      const auto = await privacidade.classificarNovos(nuvem.unclassified(cat, refs, escolhidos));
+      const todos = live || escolhidos.flatMap((pid) => nuvem.provider(cat, pid).modelos.map((m) => nuvem.modelRef(pid, m.id)));
+      const auto = await privacidade.classificarNovos(nuvem.unclassified(cat, todos, escolhidos));
+      // Ordem de recomendação (a mesma do automático), não a ordem em que o OpenCode lista.
+      const validados = Object.entries(prefs.validacoes || {}).filter(([k, v]) => k.startsWith("nuvem:") && v?.fluxo?.ok).map(([k]) => k.slice(6));
+      const recomendados = nuvem.autoCandidates(cat, escolhidos, todos, validados, auto);
+      const refs = [...recomendados, ...todos.filter((r) => !recomendados.includes(r))];
       const rotulo = (ref) => {
         const m = nuvem.findModel(cat, ref);
+        if (ref === recomendados[0]) return `${ref} — ${nuvem.ETIQUETA[m ? m.privacidade : "sem-treino"]} (RECOMENDADO HOJE: é o que o Automático usaria)`;
         if (m) return `${ref} — ${nuvem.ETIQUETA[m.privacidade]}`;
         const a = auto[ref];
         return a && a.privacidade !== "desconhecida"
           ? `${ref} — ${nuvem.ETIQUETA[a.privacidade]} (modelo novo; classificado pela documentação oficial)`
           : `${ref} — privacidade NÃO classificada (modelo novo; pode treinar com seus dados)`;
       };
+      console.log("\nEm ordem de recomendação: primeiro os que não treinam com seus dados (o 1º é o que o Automático usaria hoje).");
+      console.log("A ordem segue privacidade e validação, não é um ranking de desempenho (veja docs/nuvem-gratuita.md).");
       const j = await choose("Número", refs.map(rotulo), { defaultIndex: Math.max(0, refs.indexOf(atual)) });
       modelo = refs[j];
       const m = nuvem.findModel(cat, modelo) || (auto[modelo] && { privacidade: auto[modelo].privacidade, nota_privacidade: auto[modelo].nota });

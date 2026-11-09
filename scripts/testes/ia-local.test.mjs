@@ -716,8 +716,10 @@ test("CLI: modo — fixar modelo lista os modelos de HOJE e marca os novos como 
   const home = tmpHome();
   const bins = fakeBinaries(mock.port);
   const env = cloudEnv(home, bins);
-  // nuvem, liberar opencode, não openrouter, concordo, "2" = fixar, "2" = segundo modelo da lista de hoje
-  const r = await runCli(["modo"], { env, input: "\n\nn\nconcordo\n2\n2\n" });
+  // nuvem, liberar opencode, não openrouter, concordo, "2" = fixar, "4" = quarto da lista (ordem de recomendação)
+  const r = await runCli(["modo"], { env, input: "\n\nn\nconcordo\n2\n4\n" });
+  assert.match(r.out, /1\) opencode\/deepseek-v4\.1-flash-free — não treina com seus dados \(RECOMENDADO HOJE/, "recomendado primeiro, mesmo listado depois pelo OpenCode");
+  assert.match(r.out, /2\) opencode\/glm-5\.3-flash-free/);
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /opencode\/novo-teste-free — privacidade NÃO classificada/);
   assert.match(r.out, /opencode\/glm-5\.3-flash-free — não treina com seus dados/);
