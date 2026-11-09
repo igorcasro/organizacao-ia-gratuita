@@ -1,6 +1,6 @@
 # Manual — Windows 11
 
-Instalação **nativa** no Windows (sem WSL). Situação dos testes: **pendente de validação no Windows**; os comandos foram confirmados na documentação oficial (ver [validacao.md](validacao.md) e [fontes.md](fontes.md)).
+Instalação **nativa** no Windows (sem WSL). Situação dos testes: a **Parte A** (modo nuvem) e o **Desktop** foram **testados no Windows 11** em 2026-11-07 e 08; a **Parte B** (modelo local) ainda não. Detalhes em [validacao.md](validacao.md); fontes em [fontes.md](fontes.md).
 
 **Versões de referência** (instale exatamente estas para reproduzir; para atualizar depois, veja [problemas.md](problemas.md#atualização)):
 
@@ -14,7 +14,8 @@ Instalação **nativa** no Windows (sem WSL). Situação dos testes: **pendente 
 O OpenCode 1 recomendava WSL no Windows. O OpenCode 2 publica binários nativos para Windows, e o Ollama roda como aplicativo nativo com suporte a GPU NVIDIA e AMD. Usar WSL acrescentaria uma segunda instalação de Linux, a ponte de rede entre Windows e WSL e a configuração de GPU dentro do WSL, sem benefício claro para este fluxo. Se um impedimento concreto aparecer na validação, isso será documentado.
 
 ### Qual caminho seguir
-- **Recomendado: nuvem gratuita (Parte A).** Sem Ollama e sem download. Passos A1 a A6.
+- **Mais rápido: [Instalação rápida](#instalação-rápida-parte-a--desktop-em-3-blocos)** — a Parte A e o Desktop em 3 blocos de comandos. Os passos detalhados (A1 a A7) servem de referência e para resolver falhas.
+- **Recomendado: nuvem gratuita (Parte A).** Sem Ollama e sem download. Passos A1 a A7.
 - **Reserva ou alternativa local (Parte B).** Só se precisar de um modelo local: modo misto (nuvem + reserva local) ou modo local (último recurso).
 - Manutenção (atualização e desinstalação): Parte C.
 
@@ -22,6 +23,65 @@ O OpenCode 1 recomendava WSL no Windows. O OpenCode 2 publica binários nativos 
 - **Terminal:** PowerShell (Windows Terminal → PowerShell). Os comandos abaixo são de PowerShell; não use o "Prompt de Comando" a menos que indicado.
 - **Valores a substituir** aparecem entre `<` e `>`; remova os sinais ao digitar.
 - **Administrador:** só quando indicado. O padrão é um PowerShell **comum**.
+- **`npm.cmd` e `opencode.cmd`:** num Windows recém-instalado, o PowerShell bloqueia scripts `.ps1`, e `npm` ou `opencode` podem falhar com *"a execução de scripts foi desabilitada"*. Chamar a versão `.cmd` evita isso sem mudar nenhuma configuração do Windows.
+
+---
+
+## Instalação rápida (Parte A + Desktop em 3 blocos)
+
+Cada bloco é colado inteiro num **PowerShell comum** (Windows Terminal → PowerShell). Rode um bloco, confira o "Esperado" e passe ao seguinte. Se algo falhar, vá ao passo detalhado indicado. É o mesmo conteúdo dos passos A1 a A7, só agrupado.
+
+### Bloco 1 — Programas e repositório (alguns minutos)
+
+Instala **só o que faltar**: Node.js e Git (pelo `winget`), o OpenCode 2.2.6 (pelo `npm`) e baixa este repositório para a sua pasta de usuário. O `winget` pode pedir para aceitar os termos da fonte (responda `Y`), e o Windows pode pedir **permissão de administrador** para instalar o Node.js e o Git, que são instalados para o computador inteiro.
+
+```powershell
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) { winget install --id OpenJS.NodeJS.LTS -e }
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e }
+$env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [Environment]::GetEnvironmentVariable("Path", "User")
+npm.cmd install -g @opencode/cli@2.2.6
+$repo = Join-Path $HOME "organizacao-ia-gratuita"
+if (-not (Test-Path $repo)) { git clone https://github.com/igorcasro/organizacao-ia-gratuita.git $repo }
+Set-Location $repo
+node --version; git --version; opencode.cmd --version
+```
+
+- **Esperado:** no fim, três versões: `v20` ou mais nova do Node.js, a do Git e `2.2.6` do OpenCode. O prompt termina em `organizacao-ia-gratuita>`.
+- **Se falhar:** `winget` não reconhecido → Passo A1 (num Windows recém-instalado, o `winget` pode levar alguns minutos para ficar disponível, ou exigir atualizar o "Instalador de Aplicativo" na Microsoft Store); erro no `npm` → Passo A2; erro no `git clone` → Passo A3.
+
+### Bloco 2 — Modo nuvem e verificação (interativo)
+
+```powershell
+node scripts\ia-local.mjs modo
+node scripts\ia-local.mjs verificar
+```
+
+- **Respostas no `modo`** (decisões **suas**): Enter para **nuvem**; leia os avisos; Enter para liberar **opencode**; `n` para o OpenRouter; digite **`concordo`**; Enter para o modelo **Automático**.
+- **No `verificar`:** responda `S` ao pedido de teste.
+- **Esperado:** `Resultado: verificado tecnicamente`, com o modelo automático do dia (que não treina com os seus dados).
+- **Se falhar:** Passos A4 e A5 e [problemas.md](problemas.md).
+
+### Bloco 3 — Desktop (recomendado)
+
+Grava a configuração global (pede confirmação: responda `s`), reinicia o serviço do OpenCode e abre o download do instalador oficial do Desktop no navegador.
+
+```powershell
+node scripts\ia-local.mjs config-global aplicar
+opencode.cmd service restart
+Start-Process "https://opencode.ai/update/api/latest/desktop/opencode/opencode-desktop-win-x64.exe"
+```
+
+Execute o instalador baixado (testado: não pede administrador). **Depois que ele terminar**, no mesmo PowerShell:
+
+```powershell
+node scripts\ia-local.mjs desktop atalho
+```
+
+- **Esperado:** `Atalho criado: ...\Desktop\OpenCode (gratuito).lnk`. Abra o Desktop sempre por esse atalho. **Não faça login** no Desktop.
+- **Conferência:** no Desktop, peça `Execute o comando: curl.exe -sS https://example.com`; o OpenCode deve pedir aprovação (rejeite).
+- **Se falhar:** Passo A7 e [interface-grafica.md](interface-grafica.md).
+
+**Opcional:** `node scripts\ia-local.mjs validar-fluxo` (roteiro de 6 itens num projeto descartável, Passo A5).
 
 ---
 

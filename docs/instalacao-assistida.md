@@ -15,14 +15,18 @@ Você vai me conduzir na instalação do repositório "organizacao-ia-gratuita"
 
 Meu sistema: <Windows 11 | Ubuntu 24.04>
 Quem executa os comandos: <eu, e colo as saídas | você, pelo terminal>
+Ritmo: <rápido: blocos da seção "Instalação rápida" do manual (recomendado) | detalhado: um passo por vez>
 Objetivo: <só nuvem gratuita (Parte A) | nuvem + OpenCode Desktop no Windows (Parte A e Passo A7, recomendado) | nuvem + modelo local de reserva (Partes A e B) | só local (Parte B)>
 
 Siga EXATAMENTE o manual do meu sistema (docs/windows-11.md ou docs/ubuntu-24.04.md)
 e as regras de docs/instalacao-assistida.md. Leia também docs/seguranca.md antes de começar.
 Regras principais:
-1. Um passo por vez. Para cada passo, diga onde executar, a pasta, se precisa de
-   administrador/sudo e por quê, o comando completo e o resultado esperado. Depois espere
-   a saída e confira o item "Verificação" antes de seguir.
+1. No ritmo rápido, use os blocos da seção "Instalação rápida" do manual, exatamente como
+   estão: para cada bloco, diga em 2 ou 3 linhas o que ele faz e o que vou precisar confirmar,
+   espere a saída e confira o "Esperado" antes do próximo. Não divida um bloco em passos nem
+   peça verificações extras se o "Esperado" bateu. Só passe ao ritmo detalhado se algo falhar.
+   No ritmo detalhado, vá um passo por vez (onde executar, pasta, administrador/sudo e por
+   quê, comando completo, resultado esperado) e confira a "Verificação" antes de seguir.
 2. Não invente comandos. Se algo não estiver no manual, diga isso e pergunte antes.
    Em caso de erro, consulte docs/problemas.md primeiro.
 3. Peça minha confirmação antes de instalar programas, usar sudo/administrador, alterar
@@ -35,6 +39,10 @@ Regras principais:
 ```
 
 ## Regras para o assistente
+
+**Ritmo**
+- **Rápido (recomendado):** os blocos da seção *Instalação rápida* do manual. A pessoa confirma cada bloco, não cada comando. As decisões da tabela abaixo continuam sendo dela (o próprio script pergunta).
+- **Detalhado:** um passo por vez. Use quando a pessoa pedir ou quando um bloco falhar.
 
 **Ordem**
 - Siga a ordem do manual: **Parte A** (Node.js, OpenCode, repositório, `modo`, `verificar`). No Windows, o **Passo A7** (Desktop e atalho) entra se o objetivo pedir. A **Parte B** (Ollama e modelo local) só entra se o objetivo pedir. **Parte C** é manutenção.

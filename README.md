@@ -32,6 +32,8 @@ Versões de referência (consultadas em 2026-11-07): **OpenCode 2.2.6**, **Node.
 
 ## Início rápido
 
+**Windows, caminho mais rápido:** a [Instalação rápida](docs/windows-11.md#instalação-rápida-parte-a--desktop-em-3-blocos) faz tudo abaixo (inclusive o Desktop) em 3 blocos de comandos. Ou peça a uma IA para conduzir: [docs/instalacao-assistida.md](docs/instalacao-assistida.md).
+
 1. Siga a **Parte A** do manual do seu sistema (Node.js, OpenCode e este repositório):
    [Windows 11](docs/windows-11.md) · [Ubuntu 24.04](docs/ubuntu-24.04.md)
 2. Na pasta deste repositório (comando igual nos dois sistemas):
