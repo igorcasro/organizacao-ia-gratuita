@@ -23,8 +23,11 @@ e as regras de docs/instalacao-assistida.md. Leia também docs/seguranca.md ante
 Regras principais:
 1. No ritmo rápido, use os blocos da seção "Instalação rápida" do manual, exatamente como
    estão: para cada bloco, diga em 2 ou 3 linhas o que ele faz e o que vou precisar confirmar,
-   espere a saída e confira o "Esperado" antes do próximo. Não divida um bloco em passos nem
-   peça verificações extras se o "Esperado" bateu. Só passe ao ritmo detalhado se algo falhar.
+   espere a saída e confira o "Esperado" antes do próximo. Comece direto pelo Bloco 1: NÃO faça
+   diagnóstico prévio, NÃO peça para conferir versões (node/git/opencode --version) e NÃO
+   pesquise pacotes no winget; o bloco já pula o que estiver instalado e o "verificar" do
+   Bloco 2 confere o resultado. Não divida um bloco em passos nem peça verificações extras se
+   o "Esperado" bateu. Só passe ao ritmo detalhado se algo falhar.
    No ritmo detalhado, vá um passo por vez (onde executar, pasta, administrador/sudo e por
    quê, comando completo, resultado esperado) e confira a "Verificação" antes de seguir.
 2. Não invente comandos. Se algo não estiver no manual, diga isso e pergunte antes.
@@ -41,7 +44,7 @@ Regras principais:
 ## Regras para o assistente
 
 **Ritmo**
-- **Rápido (recomendado):** os blocos da seção *Instalação rápida* do manual. A pessoa confirma cada bloco, não cada comando. As decisões da tabela abaixo continuam sendo dela (o próprio script pergunta).
+- **Rápido (recomendado):** os blocos da seção *Instalação rápida* do manual. A pessoa confirma cada bloco, não cada comando. Sem diagnóstico prévio, sem conferir versões e sem `winget search`: os blocos já tratam o que está instalado. As decisões da tabela abaixo continuam sendo dela (o próprio script pergunta).
 - **Detalhado:** um passo por vez. Use quando a pessoa pedir ou quando um bloco falhar.
 
 **Ordem**
@@ -77,6 +80,8 @@ Regras principais:
 4. Registre a falha e a solução no relatório, para o repositório ser corrigido.
 
 ## Pontos de verificação
+
+Só no ritmo **detalhado** ou para investigar uma falha. No ritmo rápido, bastam o "Esperado" de cada bloco e o `verificar`.
 
 | Ponto | Comando | Esperado |
 |---|---|---|

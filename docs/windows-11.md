@@ -43,10 +43,10 @@ npm.cmd install -g @opencode/cli@2.2.6
 $repo = Join-Path $HOME "organizacao-ia-gratuita"
 if (-not (Test-Path $repo)) { git clone https://github.com/igorcasro/organizacao-ia-gratuita.git $repo }
 Set-Location $repo
-node --version; git --version; opencode.cmd --version
 ```
 
-- **Esperado:** no fim, três versões: `v20` ou mais nova do Node.js, a do Git e `2.2.6` do OpenCode. O prompt termina em `organizacao-ia-gratuita>`.
+- **Não é preciso conferir versões nem pesquisar no `winget` antes:** o próprio bloco pula o que já está instalado, e o `verificar` do Bloco 2 confere o OpenCode.
+- **Esperado:** nenhuma mensagem de erro em vermelho, e o prompt termina em `organizacao-ia-gratuita>`.
 - **Se falhar:** `winget` não reconhecido → Passo A1 (num Windows recém-instalado, o `winget` pode levar alguns minutos para ficar disponível, ou exigir atualizar o "Instalador de Aplicativo" na Microsoft Store); erro no `npm` → Passo A2; erro no `git clone` → Passo A3.
 
 ### Bloco 2 — Modo nuvem e verificação (interativo)
