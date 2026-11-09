@@ -34,7 +34,12 @@ O OpenCode grava as sessões completas (pedidos, respostas, trechos de arquivos 
 - **Pendente:** quais consultas o aplicativo do Ollama para Windows faz sozinho (por exemplo, verificação de atualização). Não foi verificado no código.
 
 ### Os scripts deste repositório
-Não enviam nada para a internet. Eles conversam só com o Ollama local (`127.0.0.1:11434`) e executam comandos do `ollama` e do `opencode`. A única exceção é o pedido de teste opcional de `verificar` no modo nuvem, que só é enviado se você confirmar. Para conferir: procure `fetch(` e endereços `https://` em `scripts/lib/`.
+Conversam com o Ollama local (`127.0.0.1:11434`) e executam comandos do `ollama`, do `opencode` e do `git`. O que sai para a internet:
+- o pedido de teste opcional de `verificar` no modo nuvem, só se você confirmar;
+- `atualizar` / `/atualizar-ia`: `git fetch` e `git pull` no GitHub, só quando você pede;
+- **quando aparece um modelo gratuito novo** (fora do catálogo), no máximo **uma vez por dia**: um download da página de privacidade da documentação oficial do OpenCode (`raw.githubusercontent.com/anomalyco/opencode/.../console/models.mdx`). É um pedido de leitura comum; nada do seu projeto é enviado.
+
+Para conferir: procure `fetch(` e endereços `https://` em `scripts/lib/`.
 
 ## Proteções aplicadas automaticamente pelo script
 

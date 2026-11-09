@@ -62,6 +62,8 @@ Os testes de GPU usam árvores `/sys` falsas, nomes de `lspci` e respostas simul
 | Trocar para `plan`: **Shift+Tab** (o manual dizia Tab numa orientação dada na conversa; os documentos já diziam Shift+Tab) | Testado |
 | Nova linha com Shift+Enter **não funciona** no Windows Terminal; documentada a alternativa **Ctrl+J** (doc `cli/tui.mdx`) | Shift+Enter testado; Ctrl+J pendente |
 | Acentos trocados na saída de `Get-Content` executado pelo agente (provável Windows PowerShell 5.1); ver problemas.md | Observado; causa pendente |
+| `modo` (2026-11-08): o padrão passa a ser só "Automático"; a lista de modelos aparece apenas para quem escolhe fixar um, e é a lista real do dia, não a do catálogo (pedido do mantenedor ao ver, na VM, a lista do catálogo) | Testado com teste automatizado; Windows real pendente |
+| Classificação automática da privacidade de modelos novos pela documentação oficial (`privacidade.mjs`): no texto real de 2026-11-08, classifica os 12 modelos do catálogo exatamente como o catálogo; regras e cache testados | Testado com teste automatizado e com o texto real da página; acesso à página no Windows **pendente** (o ambiente de desenvolvimento não alcança o endereço) |
 | Lista de modelos gratuitos mudou em 1 dia (2026-11-07 → 08): entraram Iceman, Inkling 2 Small e Nemotron 3.5 Super VL; saiu Pulse Alpha. Catálogo atualizado; script passa a avisar sobre modelos novos sem classificação e a escolher o modelo automaticamente | Corrigido; reteste pendente |
 | `verificar` após a correção do `PWD`: pedido de teste respondido `OK`; verificado tecnicamente | Testado |
 | `validar-fluxo` no modo nuvem com `deepseek-v4.1-flash-free`: inicialização, leitura, explicação, alteração, teste e reversão — **6 de 6** | Testado (avaliação da pessoa) |

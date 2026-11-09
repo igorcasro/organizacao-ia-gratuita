@@ -33,11 +33,11 @@ Cada bloco é colado inteiro num **PowerShell comum** (Windows Terminal → Powe
 
 ### Bloco 1 — Programas e repositório (alguns minutos)
 
-Instala **só o que faltar**: Node.js e Git (pelo `winget`), o OpenCode 2.2.6 (pelo `npm`) e baixa este repositório para a sua pasta de usuário. O `winget` pode pedir para aceitar os termos da fonte (responda `Y`), e o Windows pode pedir **permissão de administrador** para instalar o Node.js e o Git, que são instalados para o computador inteiro.
+Instala **só o que faltar**: Node.js e Git (pelo `winget`), o OpenCode 2.2.6 (pelo `npm`) e baixa este repositório para a sua pasta de usuário. O `--source winget` evita que o `winget` também consulte a Microsoft Store (num Windows recém-instalado, sem ele a instalação falhou em 2026-11-08). O `winget` pode pedir para aceitar os termos da fonte (responda `Y`), e o Windows pode pedir **permissão de administrador** para instalar o Node.js e o Git, que são instalados para o computador inteiro.
 
 ```powershell
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) { winget install --id OpenJS.NodeJS.LTS -e }
-if (-not (Get-Command git -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e }
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) { winget install --id OpenJS.NodeJS.LTS -e --source winget }
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e --source winget }
 $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [Environment]::GetEnvironmentVariable("Path", "User")
 npm.cmd install -g @opencode/cli@2.2.6
 $repo = Join-Path $HOME "organizacao-ia-gratuita"
@@ -99,8 +99,8 @@ Sem Ollama, sem download de modelos e sem exigência de hardware. Exige internet
 - **Comandos** (o `winget` já vem no Windows 11):
 
   ```powershell
-  winget install --id OpenJS.NodeJS.LTS -e
-  winget install --id Git.Git -e
+  winget install --id OpenJS.NodeJS.LTS -e --source winget
+  winget install --id Git.Git -e --source winget
   ```
 
   Alternativa sem `winget`: baixe o instalador **LTS** em https://nodejs.org e o Git em https://git-scm.com.
@@ -109,7 +109,7 @@ Sem Ollama, sem download de modelos e sem exigência de hardware. Exige internet
 
   ```powershell
   node --version   # v24.x.x (ou 20+ no mínimo)
-  npm --version
+  npm.cmd --version
   git --version
   ```
 
@@ -124,20 +124,20 @@ Sem Ollama, sem download de modelos e sem exigência de hardware. Exige internet
 - **Antes:** se já usou o OpenCode 1, remova-o (os dois usam o comando `opencode`):
 
   ```powershell
-  npm uninstall -g opencode-ai
+  npm.cmd uninstall -g opencode-ai
   ```
 
 - **Comando:**
 
   ```powershell
-  npm install -g @opencode/cli@2.2.6
+  npm.cmd install -g @opencode/cli@2.2.6
   ```
 
 - **Resultado esperado:** pacote instalado; o `postinstall` escolhe o binário nativo do Windows.
 - **Verificação:**
 
   ```powershell
-  opencode --version   # 2.2.6
+  opencode.cmd --version   # 2.2.6
   ```
 
 - **Falhas comuns:**
@@ -216,7 +216,7 @@ Janela própria em vez do terminal, com as proteções principais. Antes, leia o
 
    ```powershell
    node scripts/ia-local.mjs config-global aplicar
-   opencode service restart
+   opencode.cmd service restart
    ```
 
    Responda `s`. **Esperado:** `Gravado: C:\Users\<você>\.config\opencode\opencode.jsonc` com o modelo padrão que não treina.

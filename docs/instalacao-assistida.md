@@ -30,14 +30,17 @@ Regras principais:
    o "Esperado" bateu. Só passe ao ritmo detalhado se algo falhar.
    No ritmo detalhado, vá um passo por vez (onde executar, pasta, administrador/sudo e por
    quê, comando completo, resultado esperado) e confira a "Verificação" antes de seguir.
-2. Não invente comandos. Se algo não estiver no manual, diga isso e pergunte antes.
+2. Copie os comandos do manual exatamente como estão. No Windows, NUNCA troque `npm.cmd`
+   por `npm` nem `opencode.cmd` por `opencode`: num Windows recém-instalado, o PowerShell
+   bloqueia as versões sem `.cmd`. Não acrescente nem remova opções (como `--source winget`).
+3. Não invente comandos. Se algo não estiver no manual, diga isso e pergunte antes.
    Em caso de erro, consulte docs/problemas.md primeiro.
-3. Peça minha confirmação antes de instalar programas, usar sudo/administrador, alterar
+4. Peça minha confirmação antes de instalar programas, usar sudo/administrador, alterar
    serviços ou variáveis de ambiente, e antes de qualquer download de modelo.
-4. Nunca digite por mim a confirmação "concordo" do comando "modo", nunca escolha por mim
+5. Nunca digite por mim a confirmação "concordo" do comando "modo", nunca escolha por mim
    liberar o OpenRouter e nunca peça, leia ou escreva chaves de API, senhas ou tokens.
-5. Não conecte contas, não cadastre cartão e não use nada pago.
-6. Ao final, preencha o relatório da seção "Relatório final" de docs/instalacao-assistida.md,
+6. Não conecte contas, não cadastre cartão e não use nada pago.
+7. Ao final, preencha o relatório da seção "Relatório final" de docs/instalacao-assistida.md,
    sem dados pessoais (nome de usuário, caminhos completos, números de série).
 ```
 

@@ -14,6 +14,7 @@ import * as nuvem from "./nuvem.mjs";
 import * as configGlobal from "./configglobal.mjs";
 import * as desktop from "./desktop.mjs";
 import * as atualizarRepo from "./atualizar.mjs";
+import * as privacidade from "./privacidade.mjs";
 
 const AJUDA = `
 Uso: node scripts/ia-local.mjs [comando] [opções]
@@ -386,7 +387,7 @@ export async function cmdIniciar(args) {
     let local = null;
     if (modo === "misto") local = await localReserve(prefs);
     closeInput();
-    const escolhido = resolveCloudModel(prefs, providers);
+    const escolhido = await resolveCloudModel(prefs, providers);
     const alvo = escolhido || "modelo a escolher em /models";
     console.log(`Iniciando o OpenCode em ${dir} no modo ${modo.toUpperCase()} (${alvo}). Provedores liberados: ${providers.join(", ")}.`);
     if (local) console.log(`Reserva local disponível em /models: ollama/${local.efetivo}.`);
@@ -439,7 +440,7 @@ async function localReserve(prefs) {
 // Modelo em nuvem que será usado agora. Consulta 'opencode models' (sem enviar pedidos a modelos):
 // no automático, escolhe o melhor que não treina; num modelo fixo que sumiu da lista, cai para o automático
 // (que só usa modelos "sem-treino", então a privacidade nunca piora). Nunca troca para o local.
-function resolveCloudModel(prefs, providers, { listar = opencode.listModels } = {}) {
+async function resolveCloudModel(prefs, providers, { listar = opencode.listModels } = {}) {
   const cat = nuvem.load();
   const fixo = prefs.nuvem?.modelo && prefs.nuvem.modelo !== nuvem.AUTO ? prefs.nuvem.modelo : null;
   if (!prefs.nuvem?.modelo) return null; // "escolher depois, em /models"
@@ -447,8 +448,11 @@ function resolveCloudModel(prefs, providers, { listar = opencode.listModels } = 
   const live = r.ok ? nuvem.parseModelList(r.stdout) : null;
   if (!live) warn("Não foi possível consultar a lista atual de modelos ('opencode models'); usando o catálogo do repositório.");
   const novos = live ? nuvem.unclassified(cat, live, providers) : [];
-  if (novos.length) {
-    console.log(`Modelos gratuitos novos, ainda sem classificação de privacidade no catálogo (não são usados automaticamente): ${novos.join(", ")}.`);
+  const extras = await privacidade.classificarNovos(novos);
+  for (const r of novos) {
+    const c = extras[r];
+    const uso = c.privacidade === "sem-treino" ? "pode ser usado no automático" : "não é usado no automático";
+    console.log(`Modelo novo, fora do catálogo: ${r} — ${nuvem.ETIQUETA[c.privacidade]} (classificado automaticamente pela documentação oficial; ${uso}).`);
   }
   if (fixo && (!live || live.includes(fixo))) {
     const m = nuvem.findModel(cat, fixo);
@@ -459,12 +463,12 @@ function resolveCloudModel(prefs, providers, { listar = opencode.listModels } = 
   const validados = Object.entries(prefs.validacoes || {})
     .filter(([k, v]) => k.startsWith("nuvem:") && v?.fluxo?.ok)
     .map(([k]) => k.slice("nuvem:".length));
-  const [melhor] = nuvem.autoCandidates(cat, providers, live, validados);
+  const [melhor] = nuvem.autoCandidates(cat, providers, live, validados, extras);
   if (!melhor) {
     warn("Nenhum modelo que não treina com seus dados está disponível hoje. O OpenCode abrirá sem modelo padrão: escolha em /models, olhando a privacidade em catalogo/nuvem-gratuita.json, ou use o modo local.");
     return null;
   }
-  const nota = nuvem.findModel(cat, melhor)?.nota_privacidade || "";
+  const nota = nuvem.findModel(cat, melhor)?.nota_privacidade || extras[melhor]?.nota || "";
   console.log(`Modelo automático de hoje: ${melhor} — não treina com seus dados${validados.includes(melhor) ? "; validado no fluxo neste computador" : ""}. ${nota}`);
   prefs.nuvem.ultimo_auto = melhor;
   prefsMod.save(prefs);
@@ -539,21 +543,38 @@ export async function cmdModo() {
 
   let modelo = prefs.nuvem?.modelo || null;
   {
-    const opcoes = escolhidos.flatMap((pid) => nuvem.provider(cat, pid).modelos.map((m) => ({ ref: nuvem.modelRef(pid, m.id), m })));
-    console.log("\nModelo padrão (a lista muda com frequência):");
-    const labels = [
-      "Automático (recomendado): a cada início, o melhor modelo disponível no dia que NÃO treina com seus dados",
-      ...opcoes.map((o) => `${o.ref} — ${nuvem.ETIQUETA[o.m.privacidade]}`),
-      "Escolher depois, dentro do OpenCode (/models)",
-    ];
+    // Padrão: automático. A lista só aparece se a pessoa quiser fixar um modelo, e é a lista REAL de hoje
+    // ('opencode models'), com a privacidade do catálogo; modelos novos aparecem como "não classificada".
+    console.log("\nModelo padrão:");
     const atual = prefs.nuvem?.modelo;
-    const def = !atual || atual === nuvem.AUTO ? 0 : Math.max(0, opcoes.findIndex((o) => o.ref === atual) + 1);
-    const i = await choose("Número", labels, { defaultIndex: def });
+    const fixoAtual = atual && atual !== nuvem.AUTO;
+    const i = await choose("Número", [
+      "Automático (recomendado): a cada início, o melhor modelo disponível no dia que NÃO treina com seus dados",
+      "Fixar um modelo (avançado): escolher numa lista dos modelos disponíveis hoje",
+      "Escolher depois, dentro do OpenCode (/models)",
+    ], { defaultIndex: fixoAtual ? 1 : 0 });
     if (i === 0) modelo = nuvem.AUTO;
-    else if (i <= opcoes.length) {
-      modelo = opcoes[i - 1].ref;
-      if (opcoes[i - 1].m.privacidade !== "sem-treino") warn(opcoes[i - 1].m.nota_privacidade);
-    } else modelo = null;
+    else if (i === 2) modelo = null;
+    else {
+      const r = opencode.listModels(escolhidos);
+      const live = r.ok ? nuvem.parseModelList(r.stdout).filter((ref) => escolhidos.some((p) => ref.startsWith(`${p}/`))) : null;
+      if (!live) warn("Não foi possível consultar a lista de hoje ('opencode models'); mostrando o catálogo do repositório.");
+      const refs = live || escolhidos.flatMap((pid) => nuvem.provider(cat, pid).modelos.map((m) => nuvem.modelRef(pid, m.id)));
+      const auto = await privacidade.classificarNovos(nuvem.unclassified(cat, refs, escolhidos));
+      const rotulo = (ref) => {
+        const m = nuvem.findModel(cat, ref);
+        if (m) return `${ref} — ${nuvem.ETIQUETA[m.privacidade]}`;
+        const a = auto[ref];
+        return a && a.privacidade !== "desconhecida"
+          ? `${ref} — ${nuvem.ETIQUETA[a.privacidade]} (modelo novo; classificado pela documentação oficial)`
+          : `${ref} — privacidade NÃO classificada (modelo novo; pode treinar com seus dados)`;
+      };
+      const j = await choose("Número", refs.map(rotulo), { defaultIndex: Math.max(0, refs.indexOf(atual)) });
+      modelo = refs[j];
+      const m = nuvem.findModel(cat, modelo) || (auto[modelo] && { privacidade: auto[modelo].privacidade, nota_privacidade: auto[modelo].nota });
+      if (!m || m.privacidade === "desconhecida") warn("Este modelo ainda não tem a privacidade classificada. Trate como se pudesse treinar com seus dados.");
+      else if (m.privacidade !== "sem-treino") warn(m.nota_privacidade);
+    }
   }
   if (modo === "misto" && !prefs.modelo) {
     console.log("Modo misto: para ter a reserva local, rode depois 'diagnostico' e 'selecionar' (exige Ollama e download).");
@@ -582,7 +603,7 @@ async function verificarNuvem(prefs) {
   const missing = nuvem.missingKeys(cat, providers);
   add("Chaves necessárias no ambiente", missing.length === 0, missing.length ? `faltando: ${missing.map((m) => m.variavel).join(", ")}` : "nenhuma faltando");
   let modelo = prefs.nuvem?.modelo || null;
-  if (oc.instalado && oc.major === 2 && modelo) modelo = resolveCloudModel(prefs, providers);
+  if (oc.instalado && oc.major === 2 && modelo) modelo = await resolveCloudModel(prefs, providers);
   if (oc.instalado && oc.major === 2) {
     console.log("\nConsultando o catálogo do OpenCode com as políticas do modo (nenhum pedido é enviado a modelos)...");
     const r = opencode.listModels(providers, modelo || undefined);

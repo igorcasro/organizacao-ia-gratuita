@@ -19,7 +19,7 @@ Permitir que pessoas diferentes, em computadores diferentes (Windows 11 ou Ubunt
 ## Estrutura
 
 - `scripts/ia-local.mjs` — ponto de entrada (Node.js ≥ 20, sem dependências externas).
-- `scripts/lib/` — módulos: `nuvem` (modos e catálogo de nuvem gratuita), `diagnostico`, `gpu` (NVIDIA/AMD/Intel, dedicada × integrada), `catalogo` (regras de recomendação), `ollama` (API HTTP + CLI), `opencode`, `preferencias`, `configglobal` (comando `config-global`), `desktop` (atalho e abertura do OpenCode Desktop no Windows), `atualizar` (`git pull` do repositório), `comandos` (menu), `util`.
+- `scripts/lib/` — módulos: `nuvem` (modos e catálogo de nuvem gratuita), `diagnostico`, `gpu` (NVIDIA/AMD/Intel, dedicada × integrada), `catalogo` (regras de recomendação), `ollama` (API HTTP + CLI), `opencode`, `preferencias`, `configglobal` (comando `config-global`), `desktop` (atalho e abertura do OpenCode Desktop no Windows), `atualizar` (`git pull` do repositório), `privacidade` (classificação automática de modelos novos pela documentação oficial; regras fixas, na dúvida "desconhecida"), `comandos` (menu), `util`.
 - `scripts/testes/` — testes com Ollama e OpenCode simulados. Executar: `node --test scripts/testes/ia-local.test.mjs` (ou `npm test`).
 - `catalogo/modelos.json` — modelos locais (validado por `catalogo.validate`); `catalogo/nuvem-gratuita.json` — provedores e modelos gratuitos em nuvem (validado por `nuvem.validate`).
 - `configs/instrucoes-seguranca.md` — regras de segurança entregues ao modelo em toda sessão; mudanças nele afetam todos os usuários.

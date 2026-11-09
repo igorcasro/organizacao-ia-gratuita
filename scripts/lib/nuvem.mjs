@@ -107,11 +107,15 @@ export function findModel(cat, ref) {
 }
 
 // Candidatos ao modelo automático, do melhor para o pior.
-export function autoCandidates(cat, providers, live = null, validados = []) {
+// "extras": classificação automática de modelos novos (privacidade.mjs); entram DEPOIS dos do catálogo.
+export function autoCandidates(cat, providers, live = null, validados = [], extras = {}) {
   const ordem = [];
   for (const pid of providers) {
     const p = provider(cat, pid);
     for (const m of p?.modelos || []) if (m.privacidade === "sem-treino") ordem.push(modelRef(pid, m.id));
+  }
+  for (const [ref, c] of Object.entries(extras)) {
+    if (c?.privacidade === "sem-treino" && providers.some((p) => ref.startsWith(`${p}/`)) && !ordem.includes(ref)) ordem.push(ref);
   }
   const presentes = live ? ordem.filter((r) => live.includes(r)) : ordem;
   return [...presentes.filter((r) => validados.includes(r)), ...presentes.filter((r) => !validados.includes(r))];

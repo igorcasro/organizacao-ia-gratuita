@@ -29,6 +29,7 @@ Todas consultadas em **2026-11-07**. Quando a fonte foi o repositório oficial, 
 | Modelo padrão (`model`) na configuração | `config.mdx` (*Schema*), `models.mdx` (*Defaults*) |
 | Ordem de carga das configurações e precedência das políticas | `packages/core/src/config.ts`, `packages/core/src/config/plugin/policy.ts`; `policies.mdx` (*Precedence*) |
 | Desktop lê só `opencode.json(c)` | `build/plugins/gui/index.mdx` |
+| Privacidade por modelo (base da classificação automática; lida pelo script em `raw.githubusercontent.com/anomalyco/opencode/dev/services/site/src/docs/content/console/models.mdx`) | `console/models.mdx`, seção *Privacy* |
 | Comandos personalizados (`commands` na configuração; bloco `` !`comando` `` roda antes do envio, fora do fluxo de permissões) | `commands.mdx` (*JSON*, *Shell*) |
 | Recarga automática quando arquivos de configuração mudam; variáveis `{env:}` e `{file:}` na configuração | `plugins.mdx` (*Reload*), `config.mdx` (*Variables*) |
 | Pasta do Desktop instalado por usuário no Windows (`%LOCALAPPDATA%\Programs\ai.opencode.desktop\OpenCode.exe`) | Observado no Windows 11 em 2026-11-08 (não documentado) |

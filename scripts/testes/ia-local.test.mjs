@@ -364,7 +364,7 @@ test("provedores liberados por modo", () => {
 });
 
 function cloudEnv(home, bins, extra = {}) {
-  return { IA_LOCAL_HOME: home, OLLAMA_HOST: "127.0.0.1:9", PATH: `${bins.dir}${path.delimiter}${process.env.PATH}`, OPENCODE_API_KEY: "chave-paga-que-nao-deve-passar", OPENROUTER_API_KEY: "", ...extra };
+  return { IA_LOCAL_HOME: home, OLLAMA_HOST: "127.0.0.1:9", PATH: `${bins.dir}${path.delimiter}${process.env.PATH}`, OPENCODE_API_KEY: "chave-paga-que-nao-deve-passar", OPENROUTER_API_KEY: "", IA_LOCAL_FONTE_PRIVACIDADE: path.join(home, "sem-documentacao.mdx"), ...extra };
 }
 
 test("CLI: modo nuvem exige 'concordo' e não altera nada sem ele", { skip: SKIP_CLI }, async () => {
@@ -405,7 +405,7 @@ test("CLI: modo nuvem sem Ollama — seleção, verificação e início", { skip
   const cfg = JSON.parse(fs.readFileSync(launch.OPENCODE_CONFIG, "utf8"));
   assert.equal(cfg.model, "opencode/deepseek-v4.1-flash-free", "automático: primeiro 'sem-treino' do catálogo presente hoje (Big Pickle, listado antes, pode treinar)");
   assert.match(ini.out, /Modelo automático de hoje: opencode\/deepseek-v4\.1-flash-free/);
-  assert.match(ini.out, /sem classificação de privacidade.*opencode\/novo-teste-free/);
+  assert.match(ini.out, /Modelo novo, fora do catálogo: opencode\/novo-teste-free — privacidade não informada.*não é usado no automático/);
   assert.deepEqual(cfg.policies.map((p) => `${p.resource}:${p.effect}`), ["*:deny", "opencode:allow", "*:deny"]);
   assert.ok(!bins.calls().some((c) => c.bin === "ollama" && c.args[0] !== "--version"), "não chama o Ollama no modo nuvem");
 });
@@ -710,4 +710,81 @@ test("atualizar: git pull só quando pedido, avança o repositório e não toca 
 
   // O comando /atualizar-ia gravado na configuração global chama este script.
   assert.match(cg.config().commands["atualizar-ia"].template, /!`node ".*scripts\/ia-local\.mjs" atualizar`/);
+});
+
+test("CLI: modo — fixar modelo lista os modelos de HOJE e marca os novos como não classificados", { skip: SKIP_CLI }, async () => {
+  const home = tmpHome();
+  const bins = fakeBinaries(mock.port);
+  const env = cloudEnv(home, bins);
+  // nuvem, liberar opencode, não openrouter, concordo, "2" = fixar, "2" = segundo modelo da lista de hoje
+  const r = await runCli(["modo"], { env, input: "\n\nn\nconcordo\n2\n2\n" });
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /opencode\/novo-teste-free — privacidade NÃO classificada/);
+  assert.match(r.out, /opencode\/glm-5\.3-flash-free — não treina com seus dados/);
+  const prefs = JSON.parse(fs.readFileSync(path.join(home, "preferencias.json"), "utf8"));
+  assert.equal(prefs.nuvem.modelo, "opencode/novo-teste-free");
+  assert.match(r.out, /ainda não tem a privacidade classificada/);
+});
+
+test("privacidade automática: lê a documentação oficial com regras fixas e, na dúvida, 'desconhecida'", async () => {
+  const pv = await import("../lib/privacidade.mjs");
+  const nuvemMod = await import("../lib/nuvem.mjs");
+  const doc = [
+    "## Free models", "- Alfa Novo Free is free.", "- Beta Novo Free is free.", "",
+    "## Privacy", "",
+    "All our models are hosted in the US and EU. Our providers follow a zero-retention policy and do not use your data for model training, with the following exceptions:", "",
+    "- Beta Novo Free: During its free period, collected data is retained and used to improve the model.",
+    "- Gama Novo Free: During its free period, collected data is retained for 30 days and is not used for model training.",
+    "- Delta Novo Free (NVIDIA free endpoints): Trial use only — do not submit personal or confidential data. Your use is logged.",
+    "- Epsilon Novo Free: collected data is retained and may be used to monitor the model and for model training.", "",
+    "## For teams", "- Zeta Novo Free: texto fora da seção",
+  ].join("\n");
+  const c = (id) => pv.classificar(doc, `opencode/${id}`).privacidade;
+  assert.equal(c("alfa-novo-free"), "sem-treino", "fora das exceções e citado na página: regra geral");
+  assert.equal(c("beta-novo-free"), "pode-treinar");
+  assert.equal(c("gama-novo-free"), "sem-treino");
+  assert.equal(c("delta-novo-free"), "registrado");
+  assert.equal(c("epsilon-novo-free"), "pode-treinar");
+  assert.equal(c("omega-desconhecido-free"), "desconhecida", "não citado na página");
+  assert.equal(pv.classificar(doc.replace("zero-retention policy", "retention policy"), "opencode/alfa-novo-free").privacidade, "desconhecida", "frase-base mudou");
+  assert.equal(pv.classificar(null, "opencode/alfa-novo-free").privacidade, "desconhecida");
+
+  // Cache diário e sem acesso: nunca "sem-treino".
+  const arquivo = path.join(tmpHome(), "cache.json");
+  let buscas = 0;
+  const buscar = async () => (buscas++, doc);
+  let r = await pv.classificarNovos(["opencode/alfa-novo-free"], { buscar, hoje: "2026-11-08", arquivo });
+  assert.equal(r["opencode/alfa-novo-free"].privacidade, "sem-treino");
+  r = await pv.classificarNovos(["opencode/alfa-novo-free"], { buscar, hoje: "2026-11-08", arquivo });
+  assert.equal(buscas, 1, "uma consulta por dia");
+  r = await pv.classificarNovos(["opencode/beta-novo-free"], { buscar: async () => null, hoje: "2026-11-09", arquivo });
+  assert.equal(r["opencode/beta-novo-free"].privacidade, "desconhecida");
+
+  // Entram no automático só depois dos modelos do catálogo.
+  const cat = nuvemMod.load();
+  const live = ["opencode/alfa-novo-free", "opencode/beam-free"];
+  assert.deepEqual(nuvemMod.autoCandidates(cat, ["opencode"], live, [], { "opencode/alfa-novo-free": { privacidade: "sem-treino" } }), ["opencode/beam-free", "opencode/alfa-novo-free"]);
+  assert.deepEqual(nuvemMod.autoCandidates(cat, ["opencode"], ["opencode/alfa-novo-free"], [], { "opencode/alfa-novo-free": { privacidade: "desconhecida" } }), []);
+});
+
+test("privacidade automática: o texto real da documentação (2026-11-08) classifica igual ao catálogo", async () => {
+  const pv = await import("../lib/privacidade.mjs");
+  const doc = [
+    "- Iceman Free is free.", "- DeepSeek V4.1 Flash Free is free.",
+    "## Privacy",
+    "All our models are hosted in the US and EU. Our providers follow a zero-retention policy and do not use your data for model training, with the following exceptions:",
+    "- Big Pickle: During its free period, collected data may be used to improve the model.",
+    "- Iceman Free: During its free period, collected data is retained and used to improve the model.",
+    "- Inkling 2 Small Free: During its free period, collected data is retained and may be used to monitor the model's real-world performance and for model training. See Thinking Machines' [Terms of Service](https://x) and [Privacy Notice](https://y).",
+    "- Crouton Alpha Free: During its free period, collected data is retained for 30 days and is not used for model training.",
+    "- Flint 40B Free: During its free period, collected data may be used to improve the model. Data is retained for 30 days.",
+    "- Nemotron 3.5 Super VL Free (NVIDIA free endpoints): Trial use only — do not submit personal or confidential data. Your use is logged for security purposes and to improve NVIDIA products and services.",
+    "- Beam Free: Prompts and other inputs are not used for training. Data is retained for 30 days for safety reasons.",
+    "## For teams",
+  ].join("\n");
+  const cat = (await import("../lib/nuvem.mjs")).load();
+  for (const m of cat.provedores.find((p) => p.id === "opencode").modelos) {
+    if (["glm-5.3-flash-free", "mimo-v2.6-flash-free", "nemotron-3.5-lightning-free", "nemotron-3-ultra-free", "inkling-2-small-free"].includes(m.id) && !doc.includes(m.nome)) continue;
+    assert.equal(pv.classificar(doc, `opencode/${m.id}`).privacidade, m.privacidade, m.id);
+  }
 });

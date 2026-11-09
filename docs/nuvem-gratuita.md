@@ -65,13 +65,13 @@ Saiu da lista: `pulse-alpha-free` (descontinuado em 2026-11-06).
 Não existe uma avaliação oficial, atualizada a cada dia, dos modelos gratuitos. Por isso o **modelo automático** funciona assim, a cada `iniciar` e `verificar`:
 
 1. Consulta a lista **de hoje** com `opencode models` (não envia pedido a nenhum modelo).
-2. Considera só os modelos marcados como **não treina** no catálogo. Modelos novos, ainda sem classificação, **nunca** são escolhidos automaticamente; o script só avisa que eles existem.
+2. Considera só modelos que **não treinam** com os dados: os marcados assim no catálogo e, para **modelos novos** (fora do catálogo), os que a **documentação oficial** do OpenCode classifica assim. O script lê a seção *Privacy* da documentação no máximo uma vez por dia, com regras fixas (sem pedir a uma IA que interprete): o modelo citado nas exceções é classificado pelo texto da exceção; o que não está nas exceções só conta como "não treina" se a página citar o nome dele em outro lugar. Na dúvida (página fora do ar, formato mudou, modelo não citado), fica "não classificado" e **nunca** é escolhido. Modelos novos entram **depois** dos do catálogo, e a classificação automática fica só no seu computador.
 3. Prefere os que você já **validou no fluxo** neste computador (`validar-fluxo`).
 4. Depois, segue a ordem do catálogo, que é a avaliação do mantenedor (campo `criterio_ordem`): validado no roteiro → retenção zero → origem divulgada.
 
 Se o modelo que você fixou sumir da lista, o script avisa e usa o automático (que só escolhe modelos que não treinam). Nunca troca para o modo local.
 
-Para usar: rode `modo` e escolha a opção **Automático** (a primeira). Sem o script (Desktop, interface web ou `opencode` puro), o modelo padrão vem do `config-global aplicar`, que grava o melhor do dia; rode-o de novo quando o `iniciar` avisar que mudou. Sem isso, o OpenCode abriu com o **Big Pickle**, que pode treinar com os dados (observado em 2026-11-08).
+Para usar: rode `modo` e aperte Enter em **Automático** (a primeira opção, já marcada). Quem quiser **fixar** um modelo escolhe a segunda opção: a lista mostrada é a **de hoje** (`opencode models`), com a privacidade do catálogo; modelos novos aparecem como "privacidade NÃO classificada". Sem o script (Desktop, interface web ou `opencode` puro), o modelo padrão vem do `config-global aplicar`, que grava o melhor do dia; rode-o de novo quando o `iniciar` avisar que mudou. Sem isso, o OpenCode abriu com o **Big Pickle**, que pode treinar com os dados (observado em 2026-11-08).
 
 **Ainda não sabemos quais desses modelos funcionam bem como agente de programação** (ferramentas, edição de arquivos). Isso depende de validação (`validar-fluxo`).
 

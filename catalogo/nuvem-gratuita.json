@@ -29,7 +29,7 @@
           "id": "deepseek-v4.1-flash-free",
           "nome": "DeepSeek V4.1 Flash Free",
           "privacidade": "sem-treino",
-          "nota_privacidade": "Retenção zero; não usa os dados para treino. Validado no fluxo em 2026-11-07 (Windows 11)."
+          "nota_privacidade": "Retenção zero; não usa os dados para treino. Validado pelo mantenedor do repositório (roteiro de 6 itens, Windows 11, 2026-11-07)."
         },
         {
           "id": "glm-5.3-flash-free",

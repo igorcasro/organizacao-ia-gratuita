@@ -195,7 +195,8 @@ export async function modeloDoDiaPadrao() {
   if (!r.ok) return { modelo: null, motivo: "não foi possível consultar a lista de hoje ('opencode models'); nenhum modelo padrão gravado. ATENÇÃO: o OpenCode pode então usar um modelo que treina com seus dados." };
   const live = nuvem.parseModelList(r.stdout);
   const validados = Object.entries(prefs.validacoes || {}).filter(([k, v]) => k.startsWith("nuvem:") && v?.fluxo?.ok).map(([k]) => k.slice(6));
-  const [melhor] = nuvem.autoCandidates(cat, ["opencode"], live, validados);
+  const extras = await (await import("./privacidade.mjs")).classificarNovos(nuvem.unclassified(cat, live, ["opencode"]));
+  const [melhor] = nuvem.autoCandidates(cat, ["opencode"], live, validados, extras);
   if (!melhor) return { modelo: null, motivo: "nenhum modelo que não treina está disponível hoje; escolha em /models com cuidado." };
   return { modelo: melhor, motivo: "o melhor modelo disponível hoje que não treina com seus dados." };
 }
